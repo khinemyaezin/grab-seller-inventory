@@ -1,9 +1,9 @@
 
 import { HateoasLink, LocationFormValues, LocationResponse, LocationType, CreateLocationRequest } from "@/types";
 import { FormProvider, useForm } from "react-hook-form";
-import { Card, CardContent, CardFooter } from "@grab/seller-ui/components/card";
-import { Button } from "@grab/seller-ui/components/index";
-import { ButtonGroup } from "@grab/seller-ui/components/button-group";
+import { Card, CardContent, CardFooter } from "@khinemyaezin/seller-ui/components/card";
+import { Button } from "@khinemyaezin/seller-ui/components/index";
+import { ButtonGroup } from "@khinemyaezin/seller-ui/components/button-group";
 import { toast } from "sonner";
 import { LocationBasicFieldSet } from "./location-basic-fieldset";
 import { useCreateLocationMutation } from "@/features/inventory/hooks/use-locations";

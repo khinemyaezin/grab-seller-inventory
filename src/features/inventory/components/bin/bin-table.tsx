@@ -1,22 +1,21 @@
 
-import { Button } from "@grab/seller-ui/components/button";
-import { Badge } from "@grab/seller-ui/components/badge";
+import { Button } from "@khinemyaezin/seller-ui/components/button";
+import { Badge } from "@khinemyaezin/seller-ui/components/badge";
 import { MoreHorizontalIcon } from "lucide-react";
-import { hasLink, resolveLink } from "@grab/seller-api";
+import { hasLink, resolveLink } from "@khinemyaezin/seller-api";
 import { Link } from "react-router";
-import { routes } from "@grab/seller-contracts";
 import type { HateoasLink } from "@/types";
 import type { BinResponse } from "@/features/inventory/types/inventory.model";
 import { useBins, useActivateBinMutation, useDeactivateBinMutation, useDeleteBinMutation } from "@/features/inventory/hooks/use-bins";
 import { useEntityActions } from "@/features/inventory/hooks/use-entity-actions";
-import { ButtonGroup } from "@grab/seller-ui/components/button-group";
+import { ButtonGroup } from "@khinemyaezin/seller-ui/components/button-group";
 import {
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenu,
-} from "@grab/seller-ui/components/dropdown-menu";
+} from "@khinemyaezin/seller-ui/components/dropdown-menu";
 
 type BinTableProps = {
   locationId: string;
@@ -72,7 +71,7 @@ export function BinTable({ locationId, zoneId, link }: BinTableProps) {
                   <DropdownMenuGroup>
                     {hasLink(bin._links, "edit-bin") && (
                       <DropdownMenuItem asChild>
-                        <Link to={routes.editBin(locationId, zoneId, bin.id)}>Edit</Link>
+                        <Link to={`${zoneId}/bins/${bin.id}`}>Edit</Link>
                       </DropdownMenuItem>
                     )}
                     {activateLink && (

@@ -1,7 +1,7 @@
 
-import { Input } from "@grab/seller-ui/components/index"
-import { FieldSet, FieldGroup, Field, FieldLabel, FieldError } from "@grab/seller-ui/components/field"
-import { SelectTrigger, SelectValue, SelectContent, SelectItem, Select } from "@grab/seller-ui/components/select"
+import { Input } from "@khinemyaezin/seller-ui/components/index"
+import { FieldSet, FieldGroup, Field, FieldLabel, FieldError } from "@khinemyaezin/seller-ui/components/field"
+import { SelectTrigger, SelectValue, SelectContent, SelectItem, Select } from "@khinemyaezin/seller-ui/components/select"
 import { ZoneFormValues } from "@/features/inventory/types"
 import { ZONE_TYPES } from "@/features/inventory/types/inventory.model"
 import { Controller, useFormContext } from "react-hook-form"

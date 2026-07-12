@@ -1,10 +1,10 @@
 
 import { HateoasLink, LocationFormValues, LocationResponse, LocationType } from "@/types";
 import { FormProvider, useForm } from "react-hook-form";
-import { Card, CardContent, CardFooter } from "@grab/seller-ui/components/card";
-import { Button } from "@grab/seller-ui/components/index";
-import { ButtonGroup } from "@grab/seller-ui/components/button-group";
-import { resolveLink } from "@grab/seller-api";
+import { Card, CardContent, CardFooter } from "@khinemyaezin/seller-ui/components/card";
+import { Button } from "@khinemyaezin/seller-ui/components/index";
+import { ButtonGroup } from "@khinemyaezin/seller-ui/components/button-group";
+import { resolveLink } from "@khinemyaezin/seller-api";
 import { useUpdateLocationMutation, useActivateLocationMutation, useDeactivateLocationMutation, useLocation } from "@/features/inventory/hooks/use-locations";
 import { toast } from "sonner";
 import { useEffect } from "react";

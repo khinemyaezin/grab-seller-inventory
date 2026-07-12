@@ -1,7 +1,7 @@
 
 import { zoneService } from "@/features/inventory/api/zone";
-import { resolveUrlTemplate } from "@grab/seller-api";
-import type { HateoasLink } from "@grab/seller-api";
+import { resolveUrlTemplate } from "@khinemyaezin/seller-api";
+import type { HateoasLink } from "@khinemyaezin/seller-api";
 import { CreateZoneRequest, ListZoneResponse, UpdateZoneRequest } from "@/features/inventory/types";
 import { ZoneResponse } from "@/features/inventory/types/inventory.response";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";

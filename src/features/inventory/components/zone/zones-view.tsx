@@ -2,10 +2,10 @@
 import { HateoasLink } from "@/types"
 import { ZoneTable } from "./zone-table"
 import { Link } from "react-router"
-import { routes } from "@grab/seller-contracts"
-import { Button } from "@grab/seller-ui/components/index"
-import { ButtonGroup } from "@grab/seller-ui/components/button-group"
-import { Card, CardHeader, CardTitle, CardAction, CardContent } from "@grab/seller-ui/components/card"
+import { routes } from "@khinemyaezin/seller-contracts"
+import { Button } from "@khinemyaezin/seller-ui/components/index"
+import { ButtonGroup } from "@khinemyaezin/seller-ui/components/button-group"
+import { Card, CardHeader, CardTitle, CardAction, CardContent } from "@khinemyaezin/seller-ui/components/card"
 
 export type ZonesViewProps = {
     locationId: string,
@@ -22,7 +22,7 @@ export default function ZonesView({ locationId, link, canCreate }: ZonesViewProp
                     <ButtonGroup>
                         {canCreate && (
                             <Button type="button">
-                                <Link to={routes.newZone(locationId)}>Add Zone</Link>
+                                <Link to="new">Add Zone</Link>
                             </Button>
                         )}
                     </ButtonGroup>

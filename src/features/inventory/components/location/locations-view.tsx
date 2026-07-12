@@ -1,12 +1,12 @@
 
-import { HateoasLink } from "@grab/seller-api";
-import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@grab/seller-ui/components/card";
+import { HateoasLink } from "@khinemyaezin/seller-api";
+import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@khinemyaezin/seller-ui/components/card";
 import LocationTable from "./location-table";
-import { Button } from "@grab/seller-ui/components/button";
+import { Button } from "@khinemyaezin/seller-ui/components/button";
 import { Link } from "react-router";
-import { routes } from "@grab/seller-contracts";
+import { routes } from "@khinemyaezin/seller-contracts";
 import { useState } from "react";
-import { Pageable } from "@grab/seller-api";
+import { Pageable } from "@khinemyaezin/seller-api";
 import LocationsFilter from "./locations-filter";
 import { LocationsFilterForm } from "@/features/inventory/types/inventory.form";
 
@@ -24,7 +24,7 @@ export default function LocationsView({ link, canCreate }: LocationsViewProps) {
                 <CardAction>
                     {canCreate && (
                         <Button>
-                            <Link to={routes.newLocation}>
+                            <Link to="new">
                                 Add location
                             </Link>
                         </Button>

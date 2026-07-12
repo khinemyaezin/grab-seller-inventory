@@ -1,5 +1,5 @@
-import { api } from "@grab/seller-api";
-import type { HateoasLink } from "@grab/seller-api";
+import { api } from "@khinemyaezin/seller-api";
+import type { HateoasLink } from "@khinemyaezin/seller-api";
 import type {
   LocationResponse,
   LocationsResponse,

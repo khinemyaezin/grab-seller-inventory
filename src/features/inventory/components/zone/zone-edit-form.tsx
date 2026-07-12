@@ -6,10 +6,10 @@ import { useEffect } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import ZoneFieldSet from "./zone-fieldset";
-import { Card, CardContent, CardFooter } from "@grab/seller-ui/components/card";
-import { ButtonGroup } from "@grab/seller-ui/components/button-group";
-import { Button } from "@grab/seller-ui/components/index";
-import { resolveLink } from "@grab/seller-api";
+import { Card, CardContent, CardFooter } from "@khinemyaezin/seller-ui/components/card";
+import { ButtonGroup } from "@khinemyaezin/seller-ui/components/button-group";
+import { Button } from "@khinemyaezin/seller-ui/components/index";
+import { resolveLink } from "@khinemyaezin/seller-api";
 
 export type ZoneEditFormProps = {
     link: HateoasLink,

@@ -1,9 +1,9 @@
 
-import { Button } from "@grab/seller-ui/components/index";
-import { ButtonGroup } from "@grab/seller-ui/components/button-group";
-import { Card, CardContent, CardFooter } from "@grab/seller-ui/components/card";
+import { Button } from "@khinemyaezin/seller-ui/components/index";
+import { ButtonGroup } from "@khinemyaezin/seller-ui/components/button-group";
+import { Card, CardContent, CardFooter } from "@khinemyaezin/seller-ui/components/card";
 import { useCreateBinMutation } from "@/features/inventory/hooks/use-bins";
-import { routes } from "@grab/seller-contracts";
+import { routes } from "@khinemyaezin/seller-contracts";
 import type { HateoasLink } from "@/types";
 import type { BinFormValues } from "@/features/inventory/types";
 import { useNavigate } from "react-router";

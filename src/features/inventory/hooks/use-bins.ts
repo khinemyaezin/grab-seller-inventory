@@ -1,7 +1,7 @@
 
 import { binService } from "@/features/inventory/api/bin";
-import { resolveUrlTemplate } from "@grab/seller-api";
-import type { HateoasLink } from "@grab/seller-api";
+import { resolveUrlTemplate } from "@khinemyaezin/seller-api";
+import type { HateoasLink } from "@khinemyaezin/seller-api";
 import type { CreateBinRequest, UpdateBinRequest } from "@/features/inventory/types";
 import type { BinResponse, ListBinResponse } from "@/features/inventory/types/inventory.response";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";

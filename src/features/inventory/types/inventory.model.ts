@@ -1,4 +1,4 @@
-import type { HateoasLink } from "@grab/seller-api";
+import type { HateoasLink } from "@khinemyaezin/seller-api";
 
 export type LocationType = "WAREHOUSE" | "STORE" | "DISTRIBUTION_CENTER";
 

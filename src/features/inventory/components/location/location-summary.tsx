@@ -1,6 +1,6 @@
 
-import { Card, CardContent } from "@grab/seller-ui/components/card";
-import { Badge } from "@grab/seller-ui/components/badge";
+import { Card, CardContent } from "@khinemyaezin/seller-ui/components/card";
+import { Badge } from "@khinemyaezin/seller-ui/components/badge";
 import { MapPinIcon, BuildingIcon } from "lucide-react";
 import type { LocationResponse } from "@/features/inventory/types";
 

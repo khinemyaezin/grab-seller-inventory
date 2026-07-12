@@ -1,5 +1,5 @@
 
-import { Pageable } from "@grab/seller-api";
+import { Pageable } from "@khinemyaezin/seller-api";
 import { LocationsFilterForm } from "@/features/inventory/types";
 
 export type LocationsFilterProps = {

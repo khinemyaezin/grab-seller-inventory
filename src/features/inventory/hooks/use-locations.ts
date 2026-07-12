@@ -1,8 +1,8 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { locationService } from "@/features/inventory/api/location";
-import { resolveUrlTemplate } from "@grab/seller-api";
-import type { HateoasLink } from "@grab/seller-api";
+import { resolveUrlTemplate } from "@khinemyaezin/seller-api";
+import type { HateoasLink } from "@khinemyaezin/seller-api";
 import type {
   LocationResponse,
   LocationsResponse,

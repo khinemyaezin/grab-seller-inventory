@@ -1,18 +1,17 @@
 
 import { useState } from "react";
-import { Button } from "@grab/seller-ui/components/button";
-import { Badge } from "@grab/seller-ui/components/badge";
+import { Button } from "@khinemyaezin/seller-ui/components/button";
+import { Badge } from "@khinemyaezin/seller-ui/components/badge";
 import { ChevronDownIcon, MoreHorizontalIcon, PlusIcon } from "lucide-react";
-import { hasLink, resolveLink } from "@grab/seller-api";
+import { hasLink, resolveLink } from "@khinemyaezin/seller-api";
 import { Link } from "react-router";
-import { routes } from "@grab/seller-contracts";
 import { ZoneResponse } from "@/features/inventory/types/inventory.response";
 import { HateoasLink } from "@/types";
 import { useZones, useActivateZoneMutation, useDeactivateZoneMutation, useRemoveZoneMutation } from "@/features/inventory/hooks/use-zones";
 import { useEntityActions } from "@/features/inventory/hooks/use-entity-actions";
-import { ButtonGroup } from "@grab/seller-ui/components/button-group";
-import { CollapsibleTrigger, CollapsibleContent, Collapsible } from "@grab/seller-ui/components/collapsible";
-import { DropdownMenuTrigger, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenu } from "@grab/seller-ui/components/dropdown-menu";
+import { ButtonGroup } from "@khinemyaezin/seller-ui/components/button-group";
+import { CollapsibleTrigger, CollapsibleContent, Collapsible } from "@khinemyaezin/seller-ui/components/collapsible";
+import { DropdownMenuTrigger, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenu } from "@khinemyaezin/seller-ui/components/dropdown-menu";
 import { BinTable } from "@/features/inventory/components/bin/bin-table";
 
 type ZoneTableProps = {
@@ -79,7 +78,7 @@ export function ZoneTable({
                     <h4 className="text-sm font-medium">Bins</h4>
                     {createBinLink && (
                       <Button type="button" size="sm" variant="outline" asChild>
-                        <Link to={routes.newBin(locationId, zone.id)} className="flex items-center gap-1">
+                        <Link to={`${zone.id}/bins/new`} className="flex items-center gap-1">
                           <PlusIcon className="size-3" />
                           Add Bin
                         </Link>
@@ -103,7 +102,7 @@ export function ZoneTable({
                   <DropdownMenuGroup>
                     {hasLink(zone._links, "edit-zone") && (
                       <DropdownMenuItem asChild>
-                        <Link to={routes.editZone(locationId, zone.id)}>Edit</Link>
+                        <Link to={zone.id}>Edit</Link>
                       </DropdownMenuItem>
                     )}
                     {activateLink && (

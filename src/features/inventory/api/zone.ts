@@ -1,7 +1,7 @@
 import { CreateZoneRequest, ListZoneResponse, UpdateZoneRequest } from "@/features/inventory/types";
-import { api } from "@grab/seller-api";
+import { api } from "@khinemyaezin/seller-api";
 import { ZoneResponse } from "@/features/inventory/types/inventory.response";
-import type { HateoasLink } from "@grab/seller-api";
+import type { HateoasLink } from "@khinemyaezin/seller-api";
 
 export const zoneService = {
     createZone: (link: HateoasLink, request: CreateZoneRequest, headers?: Record<string, string>) =>

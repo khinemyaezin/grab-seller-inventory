@@ -7,20 +7,19 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@grab/seller-ui/components/table";
-import { Badge } from "@grab/seller-ui/components/badge";
+} from "@khinemyaezin/seller-ui/components/table";
+import { Badge } from "@khinemyaezin/seller-ui/components/badge";
 import { Link } from "react-router";
 import { useEffect, useState } from "react";
-import { hasLink, resolveLink } from "@grab/seller-api";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "@grab/seller-ui/components/dropdown-menu";
+import { hasLink, resolveLink } from "@khinemyaezin/seller-api";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "@khinemyaezin/seller-ui/components/dropdown-menu";
 import { Ellipsis } from "lucide-react";
-import { Button } from "@grab/seller-ui/components/index";
-import { routes } from "@grab/seller-contracts";
-import { Pager } from "@grab/seller-ui/components/pager";
+import { Button } from "@khinemyaezin/seller-ui/components/index";
+import { Pager } from "@khinemyaezin/seller-ui/components/pager";
 import { HateoasLink } from "@/types";
 import { useLocations, useActivateLocationMutation, useDeactivateLocationMutation, useDeleteLocationMutation } from "@/features/inventory/hooks/use-locations";
 import { useEntityActions } from "@/features/inventory/hooks/use-entity-actions";
-import { Pageable } from "@grab/seller-api";
+import { Pageable } from "@khinemyaezin/seller-api";
 
 export type LocationTableProps = {
   link: HateoasLink;
@@ -71,7 +70,7 @@ export default function LocationTable({ link, filter, onPageChange }: LocationTa
               <TableCell className="font-medium">
                 {hasLink(location._links, "self") ? (
                   <Link
-                    to={routes.zones(location.id)}
+                    to={`${location.id}/zones`}
                     className="text-blue-600 hover:underline"
                   >
                     {location.code}
@@ -103,7 +102,7 @@ export default function LocationTable({ link, filter, onPageChange }: LocationTa
                     <DropdownMenuGroup>
                       {hasLink(location._links, "edit-location") && (
                         <DropdownMenuItem asChild>
-                          <Link to={routes.editLocation(location.id)}>Edit</Link>
+                          <Link to={location.id}>Edit</Link>
                         </DropdownMenuItem>
                       )}
                       {activateLink && (

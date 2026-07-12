@@ -1,7 +1,7 @@
 
-import { Button } from "@grab/seller-ui/components/index";
-import { ButtonGroup } from "@grab/seller-ui/components/button-group";
-import { Card, CardContent, CardFooter } from "@grab/seller-ui/components/card";
+import { Button } from "@khinemyaezin/seller-ui/components/index";
+import { ButtonGroup } from "@khinemyaezin/seller-ui/components/button-group";
+import { Card, CardContent, CardFooter } from "@khinemyaezin/seller-ui/components/card";
 import { useAddZoneMutation } from "@/features/inventory/hooks/use-zones";
 import { HateoasLink } from "@/types";
 import { ZoneFormValues } from "@/features/inventory/types";

@@ -1,15 +1,15 @@
 
 import { Controller, useFormContext } from "react-hook-form";
-import { Input } from "@grab/seller-ui/components/input";
+import { Input } from "@khinemyaezin/seller-ui/components/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@grab/seller-ui/components/select";
+} from "@khinemyaezin/seller-ui/components/select";
 import type { LocationFormValues, LocationType } from "@/features/inventory/types";
-import { Field, FieldDescription, FieldGroup, FieldLabel, FieldLegend, FieldSeparator, FieldSet } from "@grab/seller-ui/components/field";
+import { Field, FieldDescription, FieldGroup, FieldLabel, FieldLegend, FieldSeparator, FieldSet } from "@khinemyaezin/seller-ui/components/field";
 
 export type LocationFormProps = {
 }

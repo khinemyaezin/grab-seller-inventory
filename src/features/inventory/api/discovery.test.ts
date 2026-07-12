@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { http, HttpResponse } from "msw";
-import { configureApi } from "@grab/seller-api";
+import { configureApi } from "@khinemyaezin/seller-api";
 import { server } from "@/test/server";
 import { fetchInventoryRoot } from "./discovery";
 
