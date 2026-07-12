@@ -6,7 +6,7 @@ import { ChevronDownIcon, MoreHorizontalIcon, PlusIcon } from "lucide-react";
 import { hasLink, resolveLink } from "@khinemyaezin/seller-api";
 import { Link } from "react-router";
 import { ZoneResponse } from "@/features/inventory/types/inventory.response";
-import { HateoasLink } from "@/types";
+import { HateoasLink, ZoneLifecycleEvent, BinLifecycleEvent } from "@/types";
 import { useZones, useActivateZoneMutation, useDeactivateZoneMutation, useRemoveZoneMutation } from "@/features/inventory/hooks/use-zones";
 import { useEntityActions } from "@/features/inventory/hooks/use-entity-actions";
 import { ButtonGroup } from "@khinemyaezin/seller-ui/components/button-group";
@@ -18,23 +18,26 @@ type ZoneTableProps = {
   locationId: string,
   link: HateoasLink
   onPageChange?: (page: number) => void;
+  onLifecycleEvent?: (event: ZoneLifecycleEvent | BinLifecycleEvent) => void;
 };
 
 export function ZoneTable({
   locationId,
   link,
-  onPageChange
+  onLifecycleEvent
 }: ZoneTableProps) {
   const [expandedZoneId, setExpandedZoneId] = useState<string | null>(null);
-  const { data: zones, isLoading } = useZones(link, locationId);
+  const { data: zones } = useZones(link, locationId);
   const activateMutation = useActivateZoneMutation();
   const deactivateMutation = useDeactivateZoneMutation();
   const deleteMutation = useRemoveZoneMutation();
+
   const { handleActivate, handleDeactivate, handleDelete } = useEntityActions({
     activate: activateMutation,
     deactivate: deactivateMutation,
     delete: deleteMutation,
     entityName: "Zone",
+    onLifecycleEvent,
   });
 
   return (
@@ -75,18 +78,17 @@ export function ZoneTable({
               <CollapsibleContent className="border-t p-3">
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <h4 className="text-sm font-medium">Bins</h4>
+                    <h4 className="font-medium">Bins</h4>
                     {createBinLink && (
-                      <Button type="button" size="sm" variant="outline" asChild>
+                      <Button type="button" variant="outline" asChild>
                         <Link to={`${zone.id}/bins/new`} className="flex items-center gap-1">
-                          <PlusIcon className="size-3" />
                           Add Bin
                         </Link>
                       </Button>
                     )}
                   </div>
                   {pagedBinLink && (
-                    <BinTable locationId={locationId} zoneId={zone.id} link={pagedBinLink} />
+                    <BinTable locationId={locationId} zoneId={zone.id} link={pagedBinLink} onLifecycleEvent={onLifecycleEvent as any} />
                   )}
                 </div>
               </CollapsibleContent>

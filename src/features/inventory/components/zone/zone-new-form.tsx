@@ -1,17 +1,17 @@
 
-import { Button } from "@khinemyaezin/seller-ui/components/index";
+import { Button, ButtonStatus } from "@khinemyaezin/seller-ui/components/index";
 import { ButtonGroup } from "@khinemyaezin/seller-ui/components/button-group";
 import { Card, CardContent, CardFooter } from "@khinemyaezin/seller-ui/components/card";
 import { useAddZoneMutation } from "@/features/inventory/hooks/use-zones";
-import { HateoasLink } from "@/types";
+import { HateoasLink, ZoneLifecycleEvent } from "@/types";
 import { ZoneFormValues } from "@/features/inventory/types";
 import { FormProvider, useForm } from "react-hook-form";
-import { toast } from "sonner";
 import ZoneFieldSet from "./zone-fieldset";
 
 export type ZoneNewFormProps = {
     link: HateoasLink,
-    locationId: string
+    locationId: string,
+    onLifecycleEvent?: (event: ZoneLifecycleEvent) => void;
 }
 
 const DEFAULT_FORM_VALUES: ZoneFormValues = {
@@ -21,7 +21,7 @@ const DEFAULT_FORM_VALUES: ZoneFormValues = {
     active: true
 }
 
-export default function ZoneNewForm({ link }: ZoneNewFormProps) {
+export default function ZoneNewForm({ link, onLifecycleEvent }: ZoneNewFormProps) {
     const form = useForm<ZoneFormValues>({
         defaultValues: DEFAULT_FORM_VALUES,
         mode: "onSubmit",
@@ -34,9 +34,9 @@ export default function ZoneNewForm({ link }: ZoneNewFormProps) {
         if(!link) return;
         try {
             await createZoneMutation.mutateAsync({ link: link, request: { ...value } });
-            toast.success("Zone created", { position: "top-center" });
+            onLifecycleEvent?.({ type: "created" });
         } catch {
-            toast.error("Failed to create zone", { position: "top-center" });
+            onLifecycleEvent?.({ type: "createFailed" });
         }
     }
 
@@ -50,8 +50,19 @@ export default function ZoneNewForm({ link }: ZoneNewFormProps) {
                     <CardFooter>
                         <ButtonGroup>
                             {isDirty && (
-                                <Button type="submit" disabled={createZoneMutation.isPending}>
-                                    Save
+                                <Button type="submit" disabled={createZoneMutation.isPending || createZoneMutation.isSuccess}>
+                                    <ButtonStatus
+                                        status={
+                                            createZoneMutation.isPending
+                                                ? "pending"
+                                                : createZoneMutation.isSuccess
+                                                    ? "success"
+                                                    : "idle"
+                                        }
+                                        pendingLabel="Saving…"
+                                        successLabel="Saved">
+                                        Save
+                                    </ButtonStatus>
                                 </Button>
                             )}
                         </ButtonGroup>

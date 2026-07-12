@@ -8,14 +8,12 @@ import type {
   LocationsResponse,
   CreateLocationRequest,
   UpdateLocationRequest,
-  CreateBinRequest,
-  UpdateBinRequest,
   LocationType,
 } from "@/features/inventory/types";
 
-export function useLocations(locationsLink: HateoasLink, filters?: { active?: boolean; type?: LocationType; page?: number; size?: number }) {
+export function useLocations(locationsLink?: HateoasLink, filters?: { active?: boolean; type?: LocationType; page?: number; size?: number }) {
   return useQuery<LocationsResponse>({
-    queryKey: ["locations", locationsLink.href, filters],
+    queryKey: ["locations", locationsLink?.href, filters],
     queryFn: () => locationService.listLocations(locationsLink!, filters, { "X-Actor-Id": "seller-001" }),
     enabled: !!locationsLink,
     staleTime: 1000 * 60 * 5,

@@ -57,3 +57,42 @@ export interface LocationResponse {
   address: LocationAddress;
   _links: Record<string, HateoasLink>;
 }
+
+export type LocationLifecycleEvent =
+  | { type: "titleResolved", title: string }
+  | { type: "created" }
+  | { type: "createFailed" }
+  | { type: "updated" }
+  | { type: "updateFailed" }
+  | { type: "activated" }
+  | { type: "activateFailed" }
+  | { type: "deactivated" }
+  | { type: "deactivateFailed" }
+  | { type: "deleted" }
+  | { type: "deleteFailed" };
+
+export type ZoneLifecycleEvent =
+  | { type: "titleResolved", title: string }
+  | { type: "created" }
+  | { type: "createFailed" }
+  | { type: "updated" }
+  | { type: "updateFailed" }
+  | { type: "activated" }
+  | { type: "activateFailed" }
+  | { type: "deactivated" }
+  | { type: "deactivateFailed" }
+  | { type: "deleted" }
+  | { type: "deleteFailed" };
+
+export type BinLifecycleEvent =
+  | { type: "titleResolved", title: string }
+  | { type: "created" }
+  | { type: "createFailed" }
+  | { type: "updated" }
+  | { type: "updateFailed" }
+  | { type: "activated" }
+  | { type: "activateFailed" }
+  | { type: "deactivated" }
+  | { type: "deactivateFailed" }
+  | { type: "deleted" }
+  | { type: "deleteFailed" };

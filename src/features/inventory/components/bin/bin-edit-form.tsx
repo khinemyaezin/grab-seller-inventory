@@ -1,19 +1,19 @@
 
 import { useUpdateBinMutation, useActivateBinMutation, useDeactivateBinMutation, useBin } from "@/features/inventory/hooks/use-bins";
-import type { HateoasLink } from "@/types";
+import type { HateoasLink, BinLifecycleEvent } from "@/types";
 import type { BinFormValues } from "@/features/inventory/types";
 import { useEffect } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { toast } from "sonner";
 import BinFieldSet from "./bin-fieldset";
 import { Card, CardContent, CardFooter } from "@khinemyaezin/seller-ui/components/card";
 import { ButtonGroup } from "@khinemyaezin/seller-ui/components/button-group";
-import { Button } from "@khinemyaezin/seller-ui/components/index";
+import { Button, ButtonStatus } from "@khinemyaezin/seller-ui/components/index";
 import { resolveLink } from "@khinemyaezin/seller-api";
 
 export type BinEditFormProps = {
   link: HateoasLink;
   id: string;
+  onLifecycleEvent?: (event: BinLifecycleEvent) => void;
 };
 
 const DEFAULT_FORM_VALUES: BinFormValues = {
@@ -22,7 +22,7 @@ const DEFAULT_FORM_VALUES: BinFormValues = {
   maxCapacity: 1,
 };
 
-export default function BinEditForm({ link, id }: BinEditFormProps) {
+export default function BinEditForm({ link, id, onLifecycleEvent }: BinEditFormProps) {
   const form = useForm<BinFormValues>({
     defaultValues: DEFAULT_FORM_VALUES,
     mode: "onSubmit",
@@ -39,6 +39,12 @@ export default function BinEditForm({ link, id }: BinEditFormProps) {
   const deactivateBinMutation = useDeactivateBinMutation();
 
   useEffect(() => {
+    if (bin?.name) {
+      onLifecycleEvent?.({ type: "titleResolved", title: bin.name });
+    }
+  }, [bin?.name, onLifecycleEvent]);
+
+  useEffect(() => {
     if (bin) {
       reset({ code: bin.code, name: bin.name, maxCapacity: bin.maxCapacity, active: bin.active });
     }
@@ -48,9 +54,9 @@ export default function BinEditForm({ link, id }: BinEditFormProps) {
     if (!editBinLink) return;
     try {
       await updateBinMutation.mutateAsync({ link: editBinLink, request: { ...value } });
-      toast.success("Bin updated", { position: "top-center" });
+      onLifecycleEvent?.({ type: "updated" });
     } catch {
-      toast.error("Failed to update bin", { position: "top-center" });
+      onLifecycleEvent?.({ type: "updateFailed" });
     }
   };
 
@@ -58,9 +64,9 @@ export default function BinEditForm({ link, id }: BinEditFormProps) {
     if (!activateBinLink) return;
     try {
       await activateBinMutation.mutateAsync(activateBinLink);
-      toast.success("Bin activated", { position: "top-center" });
+      onLifecycleEvent?.({ type: "activated" });
     } catch {
-      toast.error("Failed to activate bin", { position: "top-center" });
+      onLifecycleEvent?.({ type: "activateFailed" });
     }
   };
 
@@ -68,9 +74,9 @@ export default function BinEditForm({ link, id }: BinEditFormProps) {
     if (!deactivateBinLink) return;
     try {
       await deactivateBinMutation.mutateAsync(deactivateBinLink);
-      toast.success("Bin deactivated", { position: "top-center" });
+      onLifecycleEvent?.({ type: "deactivated" });
     } catch {
-      toast.error("Failed to deactivate bin", { position: "top-center" });
+      onLifecycleEvent?.({ type: "deactivateFailed" });
     }
   };
 
@@ -90,8 +96,19 @@ export default function BinEditForm({ link, id }: BinEditFormProps) {
                 <Button type="button" variant="destructive" disabled={deactivateBinMutation.isPending} onClick={handleOnDeactivate}>Deactivate</Button>
               )}
               {isDirty && editBinLink && (
-                <Button type="submit" disabled={updateBinMutation.isPending}>
-                  Update
+                <Button type="submit" disabled={updateBinMutation.isPending || updateBinMutation.isSuccess}>
+                  <ButtonStatus
+                    status={
+                      updateBinMutation.isPending
+                        ? "pending"
+                        : updateBinMutation.isSuccess
+                          ? "success"
+                          : "idle"
+                    }
+                    pendingLabel="Saving…"
+                    successLabel="Saved">
+                    Update
+                  </ButtonStatus>
                 </Button>
               )}
             </ButtonGroup>

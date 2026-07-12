@@ -8,6 +8,9 @@ export type {
   BinResponse,
   Zone,
   LocationResponse,
+  LocationLifecycleEvent,
+  ZoneLifecycleEvent,
+  BinLifecycleEvent,
 } from "./inventory.model";
 
 // Request DTOs

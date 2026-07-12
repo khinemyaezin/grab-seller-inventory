@@ -4,7 +4,7 @@ import { Badge } from "@khinemyaezin/seller-ui/components/badge";
 import { MoreHorizontalIcon } from "lucide-react";
 import { hasLink, resolveLink } from "@khinemyaezin/seller-api";
 import { Link } from "react-router";
-import type { HateoasLink } from "@/types";
+import type { HateoasLink, BinLifecycleEvent } from "@/types";
 import type { BinResponse } from "@/features/inventory/types/inventory.model";
 import { useBins, useActivateBinMutation, useDeactivateBinMutation, useDeleteBinMutation } from "@/features/inventory/hooks/use-bins";
 import { useEntityActions } from "@/features/inventory/hooks/use-entity-actions";
@@ -21,9 +21,10 @@ type BinTableProps = {
   locationId: string;
   zoneId: string;
   link: HateoasLink;
+  onLifecycleEvent?: (event: BinLifecycleEvent) => void;
 };
 
-export function BinTable({ locationId, zoneId, link }: BinTableProps) {
+export function BinTable({ zoneId, link, onLifecycleEvent }: BinTableProps) {
   const { data: bins, isLoading } = useBins(link, zoneId);
   const activateMutation = useActivateBinMutation();
   const deactivateMutation = useDeactivateBinMutation();
@@ -33,6 +34,7 @@ export function BinTable({ locationId, zoneId, link }: BinTableProps) {
     deactivate: deactivateMutation,
     delete: deleteMutation,
     entityName: "Bin",
+    onLifecycleEvent,
   });
 
   if (isLoading) {

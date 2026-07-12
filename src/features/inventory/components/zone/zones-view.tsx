@@ -1,8 +1,7 @@
 
-import { HateoasLink } from "@/types"
+import { HateoasLink, ZoneLifecycleEvent, BinLifecycleEvent } from "@/types"
 import { ZoneTable } from "./zone-table"
 import { Link } from "react-router"
-import { routes } from "@khinemyaezin/seller-contracts"
 import { Button } from "@khinemyaezin/seller-ui/components/index"
 import { ButtonGroup } from "@khinemyaezin/seller-ui/components/button-group"
 import { Card, CardHeader, CardTitle, CardAction, CardContent } from "@khinemyaezin/seller-ui/components/card"
@@ -10,10 +9,11 @@ import { Card, CardHeader, CardTitle, CardAction, CardContent } from "@khinemyae
 export type ZonesViewProps = {
     locationId: string,
     link: HateoasLink // Zone list link,
-    canCreate: boolean
+    canCreate: boolean,
+    onLifecycleEvent?: (event: ZoneLifecycleEvent | BinLifecycleEvent) => void;
 }
 
-export default function ZonesView({ locationId, link, canCreate }: ZonesViewProps) {
+export default function ZonesView({ locationId, link, canCreate, onLifecycleEvent }: ZonesViewProps) {
     return (
         <Card>
             <CardHeader>
@@ -21,7 +21,7 @@ export default function ZonesView({ locationId, link, canCreate }: ZonesViewProp
                 <CardAction>
                     <ButtonGroup>
                         {canCreate && (
-                            <Button type="button">
+                            <Button variant="outline" type="button" asChild>
                                 <Link to="new">Add Zone</Link>
                             </Button>
                         )}
@@ -30,7 +30,7 @@ export default function ZonesView({ locationId, link, canCreate }: ZonesViewProp
             </CardHeader>
             <CardContent>
                 {link && (
-                    <ZoneTable locationId={locationId} link={link}
+                    <ZoneTable locationId={locationId} link={link} onLifecycleEvent={onLifecycleEvent}
                     ></ZoneTable>
                 )}
             </CardContent>

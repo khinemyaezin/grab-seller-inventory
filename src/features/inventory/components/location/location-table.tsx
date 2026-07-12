@@ -16,19 +16,22 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem,
 import { Ellipsis } from "lucide-react";
 import { Button } from "@khinemyaezin/seller-ui/components/index";
 import { Pager } from "@khinemyaezin/seller-ui/components/pager";
-import { HateoasLink } from "@/types";
 import { useLocations, useActivateLocationMutation, useDeactivateLocationMutation, useDeleteLocationMutation } from "@/features/inventory/hooks/use-locations";
 import { useEntityActions } from "@/features/inventory/hooks/use-entity-actions";
 import { Pageable } from "@khinemyaezin/seller-api";
+import { useInventoryLink } from "@/features/inventory/hooks/use-root";
+
+import { LocationLifecycleEvent } from "@/types";
 
 export type LocationTableProps = {
-  link: HateoasLink;
   filter: {} & Pageable,
   onPageChange?: (page: number) => void;
+  onLifecycleEvent?: (event: LocationLifecycleEvent) => void;
 };
 
-export default function LocationTable({ link, filter, onPageChange }: LocationTableProps) {
-  const { data, isLoading } = useLocations(link, filter);
+export default function LocationTable({ filter, onPageChange, onLifecycleEvent }: LocationTableProps) {
+  const pagedLocationLink = useInventoryLink("pagedLocation");
+  const { data, isLoading } = useLocations(pagedLocationLink, filter);
   const [showPagination, setShowPagination] = useState<boolean>(false);
   const activateMutation = useActivateLocationMutation();
   const deactivateMutation = useDeactivateLocationMutation();
@@ -38,6 +41,7 @@ export default function LocationTable({ link, filter, onPageChange }: LocationTa
     deactivate: deactivateMutation,
     delete: deleteMutation,
     entityName: "Location",
+    onLifecycleEvent,
   });
 
   useEffect(() => {

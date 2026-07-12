@@ -1,15 +1,31 @@
 
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { ArrowLeftIcon } from "lucide-react";
 import { ButtonGroup } from "@khinemyaezin/seller-ui/components/button-group";
 import { Button } from "@khinemyaezin/seller-ui/components/button";
 import { Header } from "@khinemyaezin/seller-ui/layout/header";
-import { routes } from "@khinemyaezin/seller-contracts";
+import { usePlatform } from "@khinemyaezin/seller-ui";
 import LocationNewForm from "@/features/inventory/components/location/location-new-form";
-import { useRoot } from "@/features/inventory/hooks/use-root";
+import { LocationLifecycleEvent } from "@/types";
 
 export default function NewLocationPage() {
-  const { data: inventoryRoot } = useRoot();
+  const navigate = useNavigate();
+  const platform = usePlatform();
+  const toast = (type: "success" | "error", message: string) =>
+    platform?.events.publish("shell:toast:v1", { type, message, position: "top-center" });
+
+  const handleEvent = (event: LocationLifecycleEvent) => {
+    switch (event.type) {
+      case "created":
+        toast("success", "Location created successfully");
+        navigate("..");
+        break;
+      case "createFailed":
+        toast("error", "Failed to create location");
+        break;
+    }
+  };
+
   return (
     <div className="container mx-auto max-w-5xl p-6">
       <Header
@@ -17,18 +33,15 @@ export default function NewLocationPage() {
         description="Create a new warehouse, store, or distribution center."
       >
         <ButtonGroup>
-          <Button type="button" variant="secondary">
+          <Button type="button" variant="secondary" asChild>
             <Link to=".." className="flex gap-2 items-center">
               <ArrowLeftIcon />
-              <span>Back to Locations</span>
             </Link>
           </Button>
 
         </ButtonGroup>
       </Header>
-      {inventoryRoot?.createLocation && (
-        <LocationNewForm link={inventoryRoot.createLocation} />
-      )}
+      <LocationNewForm onLifecycleEvent={handleEvent} />
     </div>
   );
 }

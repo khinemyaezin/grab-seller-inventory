@@ -1,18 +1,17 @@
-
-import { HateoasLink, LocationFormValues, LocationResponse, LocationType } from "@/types";
+import { HateoasLink, LocationFormValues, LocationResponse, LocationType, LocationLifecycleEvent } from "@/types";
 import { FormProvider, useForm } from "react-hook-form";
 import { Card, CardContent, CardFooter } from "@khinemyaezin/seller-ui/components/card";
-import { Button } from "@khinemyaezin/seller-ui/components/index";
+import { Button, ButtonStatus } from "@khinemyaezin/seller-ui/components/index";
 import { ButtonGroup } from "@khinemyaezin/seller-ui/components/button-group";
 import { resolveLink } from "@khinemyaezin/seller-api";
 import { useUpdateLocationMutation, useActivateLocationMutation, useDeactivateLocationMutation, useLocation } from "@/features/inventory/hooks/use-locations";
-import { toast } from "sonner";
 import { useEffect } from "react";
 import { LocationBasicFieldSet } from "./location-basic-fieldset";
+import { useInventoryLink } from "@/features/inventory/hooks/use-root";
 
 export type LocationEditFormProps = {
     locationId: string,
-    link: HateoasLink
+    onLifecycleEvent?: (event: LocationLifecycleEvent) => void;
 }
 
 const DEFAULT_FORM_VALUES: LocationFormValues = {
@@ -45,14 +44,15 @@ function locationToFormValues(location: LocationResponse): LocationFormValues {
     };
 }
 
-export default function LocationEditForm({ locationId, link }: LocationEditFormProps) {
+export default function LocationEditForm({ locationId, onLifecycleEvent }: LocationEditFormProps) {
+    const locationLink = useInventoryLink("location");
     const form = useForm<LocationFormValues>({
         defaultValues: DEFAULT_FORM_VALUES,
         mode: "onSubmit",
     });
     const { handleSubmit, reset, formState: { isDirty } } = form;
 
-    const { data: location } = useLocation(link, locationId)
+    const { data: location } = useLocation(locationLink, locationId)
     const updateMutation = useUpdateLocationMutation();
     const activateMutation = useActivateLocationMutation();
     const deactivateMutation = useDeactivateLocationMutation();
@@ -61,7 +61,15 @@ export default function LocationEditForm({ locationId, link }: LocationEditFormP
     const activateLink = resolveLink(location?._links, "activate-location");
     const deactivateLink = resolveLink(location?._links, "deactivate-location");
 
+    if (!locationLink) return null;
+
     console.log(location)
+
+    useEffect(() => {
+        if (location?.name) {
+            onLifecycleEvent?.({ type: "titleResolved", title: location.name });
+        }
+    }, [location?.name, onLifecycleEvent]);
 
     useEffect(() => {
         if (location) {
@@ -89,9 +97,9 @@ export default function LocationEditForm({ locationId, link }: LocationEditFormP
                     },
                 },
             });
-            toast.success("Location updated", { position: "top-center" });
+            onLifecycleEvent?.({ type: "updated" });
         } catch {
-            toast.error("Failed to update location", { position: "top-center" });
+            onLifecycleEvent?.({ type: "updateFailed" });
         }
     };
 
@@ -99,9 +107,9 @@ export default function LocationEditForm({ locationId, link }: LocationEditFormP
         if (!link) return;
         try {
             await activateMutation.mutateAsync(link);
-            toast.success("Location activated", { position: "top-center" });
+            onLifecycleEvent?.({ type: "activated" });
         } catch {
-            toast.error("Failed to update location status", { position: "top-center" });
+            onLifecycleEvent?.({ type: "activateFailed" });
         }
     };
 
@@ -109,9 +117,9 @@ export default function LocationEditForm({ locationId, link }: LocationEditFormP
         if (!link) return;
         try {
             await deactivateMutation.mutateAsync(link);
-            toast.success("Location deactivated", { position: "top-center" });
+            onLifecycleEvent?.({ type: "deactivated" });
         } catch {
-            toast.error("Failed to update location status", { position: "top-center" });
+            onLifecycleEvent?.({ type: "deactivateFailed" });
         }
     };
 
@@ -137,8 +145,19 @@ export default function LocationEditForm({ locationId, link }: LocationEditFormP
                             </ButtonGroup>
                             <ButtonGroup>
                                 {updateLink && isDirty && (
-                                    <Button type="submit" disabled={updateMutation.isPending}>
-                                        {updateMutation.isPending ? "Saving..." : "Save Changes"}
+                                    <Button type="submit" disabled={updateMutation.isPending || updateMutation.isSuccess}>
+                                        <ButtonStatus
+                                            status={
+                                                updateMutation.isPending
+                                                    ? "pending"
+                                                    : updateMutation.isSuccess
+                                                        ? "success"
+                                                        : "idle"
+                                            }
+                                            pendingLabel="Saving…"
+                                            successLabel="Saved">
+                                            Save
+                                        </ButtonStatus>
                                     </Button>
                                 )}
                             </ButtonGroup>

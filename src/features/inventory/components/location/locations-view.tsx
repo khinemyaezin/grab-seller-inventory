@@ -9,12 +9,14 @@ import { useState } from "react";
 import { Pageable } from "@khinemyaezin/seller-api";
 import LocationsFilter from "./locations-filter";
 import { LocationsFilterForm } from "@/features/inventory/types/inventory.form";
+import { useInventoryLink } from "@/features/inventory/hooks/use-root";
+import { LocationLifecycleEvent } from "@/types";
 
 export type LocationsViewProps = {
-    link: HateoasLink,
-    canCreate: boolean
+    onLifecycleEvent?: (event: LocationLifecycleEvent) => void;
 }
-export default function LocationsView({ link, canCreate }: LocationsViewProps) {
+export default function LocationsView({ onLifecycleEvent }: LocationsViewProps) {
+    const createLocationLink = useInventoryLink("createLocation");
     const [filter, setFilter] = useState<LocationsFilterForm & Pageable>({ page: 0, size: 20 });
 
     return (
@@ -22,8 +24,8 @@ export default function LocationsView({ link, canCreate }: LocationsViewProps) {
             <CardHeader>
                 <CardTitle>Location list</CardTitle>
                 <CardAction>
-                    {canCreate && (
-                        <Button>
+                    {createLocationLink && (
+                        <Button variant='outline' asChild>
                             <Link to="new">
                                 Add location
                             </Link>
@@ -37,11 +39,11 @@ export default function LocationsView({ link, canCreate }: LocationsViewProps) {
                 </LocationsFilter>
 
                 <LocationTable
-                    link={link}
                     filter={filter}
                     onPageChange={(page) => {
 
                     }}
+                    onLifecycleEvent={onLifecycleEvent}
                 ></LocationTable>
             </CardContent>
         </Card>
