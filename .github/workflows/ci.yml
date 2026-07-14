@@ -15,7 +15,7 @@ jobs:
         with:
           node-version: 22
           registry-url: https://registry.npmjs.org
-          scope: '@grab'
+          scope: '@khinemyaezin'
           cache: npm
           cache-dependency-path: grab-seller-inventory/package-lock.json
       - run: npm ci
