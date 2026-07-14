@@ -1,6 +1,6 @@
 import type { HateoasLink } from "@khinemyaezin/seller-api";
 
-export type LocationType = "WAREHOUSE" | "STORE" | "DISTRIBUTION_CENTER";
+export type LocationType = "WAREHOUSE" | "STORE";
 
 export type ZoneType = "PICKING" | "STORAGE" | "STAGING" | "RETURNS" | "DAMAGED" | "RECEIVING";
 

@@ -45,14 +45,14 @@ export default function EditZonePage() {
     };
 
     return (
-        <div className="container mx-auto max-w-5xl p-6">
+        <div className="container mx-auto max-w-2xl p-6">
             <Header
                 title={`Edit Zone`}
                 description="Update zone."
             >
                 <ButtonGroup>
                     <Button variant="secondary" size="icon" type="button">
-                        <Link to=".." className="flex gap-2 items-center">
+                        <Link to=".." relative="path" className="flex gap-2 items-center">
                             <ArrowLeftIcon />
                         </Link>
                     </Button>

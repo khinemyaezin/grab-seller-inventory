@@ -3,7 +3,6 @@ import { Button } from "@khinemyaezin/seller-ui/components/index";
 import { Header } from "@khinemyaezin/seller-ui/layout/header";
 import { Link, useParams } from "react-router";
 import { ArrowLeftIcon } from "lucide-react";
-import { routes } from "@khinemyaezin/seller-contracts";
 import { ButtonGroup } from "@khinemyaezin/seller-ui/components/button-group";
 import { useInventoryLink } from "@/features/inventory/hooks/use-root";
 import { useLocation } from "@/features/inventory/hooks/use-locations";
@@ -44,21 +43,25 @@ export default function NewBinPage() {
   };
 
   return (
-    <div className="container mx-auto max-w-5xl p-6">
+    <div className="container mx-auto max-w-2xl p-6">
       <Header
         title="New Bin"
         description="Create a new bin in this zone."
       >
         <ButtonGroup>
           <Button variant="secondary" size="icon" type="button">
-            <Link to=".." className="flex gap-2 items-center">
+            <Link to={{
+              pathname: "../../..",
+              search: `?active=${zoneId}`,
+            }}
+              relative="path" className="flex gap-2 items-center">
               <ArrowLeftIcon />
             </Link>
           </Button>
         </ButtonGroup>
       </Header>
       {createBinLink && (
-        <BinNewForm link={createBinLink} locationId={id} zoneId={zoneId} onLifecycleEvent={handleEvent} />
+        <BinNewForm link={createBinLink} zoneId={zoneId} onLifecycleEvent={handleEvent} />
       )}
     </div>
   );

@@ -45,15 +45,15 @@ export default function NewZonePage() {
     };
 
     return (
-        <div className="container mx-auto max-w-5xl p-6">
+        <div className="container mx-auto max-w-2xl p-6">
             <Header
                 title={`New Zone`}
                 description="Create zone."
             >
                 <ButtonGroup>
                     <ButtonGroup>
-                        <Button variant="secondary" size="icon" type="button">
-                            <Link to=".." className="flex gap-2 items-center">
+                        <Button variant="secondary" size="icon" type="button" asChild>
+                            <Link to=".." relative="path" className="flex gap-2 items-center">
                                 <ArrowLeftIcon />
                             </Link>
                         </Button>

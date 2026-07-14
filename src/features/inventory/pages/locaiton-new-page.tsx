@@ -27,7 +27,7 @@ export default function NewLocationPage() {
   };
 
   return (
-    <div className="container mx-auto max-w-5xl p-6">
+    <div className="container mx-auto max-w-2xl p-6">
       <Header
         title="Add Location"
         description="Create a new warehouse, store, or distribution center."

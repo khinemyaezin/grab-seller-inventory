@@ -89,29 +89,34 @@ export default function ZoneEditForm({ link, id, onLifecycleEvent }: ZoneEditFor
                         <ZoneFieldSet />
                     </CardContent>
                     <CardFooter className="flex justify-end border-t">
+
                         <ButtonGroup>
-                            {activateZoneLink && (
-                                <Button type="button" disabled={activateZoneMutation.isPending} onClick={handleOnActivate}>Activate</Button>
-                            )}
-                            {deactivateZoneLink && (
-                                <Button type="button" variant="destructive" disabled={deactivateZoneMutation.isPending} onClick={handleOnDeactivate}>Deactivate</Button>
-                            )}
-                            {isDirty && editZoneLink && (
-                                <Button type="submit" disabled={updateZoneMutation.isPending || updateZoneMutation.isSuccess}>
-                                    <ButtonStatus
-                                        status={
-                                            updateZoneMutation.isPending
-                                                ? "pending"
-                                                : updateZoneMutation.isSuccess
-                                                    ? "success"
-                                                    : "idle"
-                                        }
-                                        pendingLabel="Saving…"
-                                        successLabel="Saved">
-                                        Update
-                                    </ButtonStatus>
-                                </Button>
-                            )}
+                            <ButtonGroup>
+                                {activateZoneLink && (
+                                    <Button type="button" variant="outline" disabled={activateZoneMutation.isPending} onClick={handleOnActivate}>Activate</Button>
+                                )}
+                                {deactivateZoneLink && (
+                                    <Button type="button" variant="destructive" disabled={deactivateZoneMutation.isPending} onClick={handleOnDeactivate}>Deactivate</Button>
+                                )}
+                            </ButtonGroup>
+                            <ButtonGroup>
+                                {isDirty && editZoneLink && (
+                                    <Button type="submit" disabled={updateZoneMutation.isPending || updateZoneMutation.isSuccess}>
+                                        <ButtonStatus
+                                            status={
+                                                updateZoneMutation.isPending
+                                                    ? "pending"
+                                                    : updateZoneMutation.isSuccess
+                                                        ? "success"
+                                                        : "idle"
+                                            }
+                                            pendingLabel="Saving…"
+                                            successLabel="Saved">
+                                            Update
+                                        </ButtonStatus>
+                                    </Button>
+                                )}
+                            </ButtonGroup>
                         </ButtonGroup>
                     </CardFooter>
                 </Card>

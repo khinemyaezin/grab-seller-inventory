@@ -8,13 +8,14 @@ import type {
   LocationsResponse,
   CreateLocationRequest,
   UpdateLocationRequest,
-  LocationType,
+  LocationsFilterForm,
 } from "@/features/inventory/types";
+import type { Pageable } from "@khinemyaezin/seller-api";
 
-export function useLocations(locationsLink?: HateoasLink, filters?: { active?: boolean; type?: LocationType; page?: number; size?: number }) {
+export function useLocations(locationsLink?: HateoasLink, filters?: LocationsFilterForm & Pageable) {
   return useQuery<LocationsResponse>({
     queryKey: ["locations", locationsLink?.href, filters],
-    queryFn: () => locationService.listLocations(locationsLink!, filters, { "X-Actor-Id": "seller-001" }),
+    queryFn: () => locationService.listLocations(locationsLink!, filters),
     enabled: !!locationsLink,
     staleTime: 1000 * 60 * 5,
   });
@@ -24,7 +25,7 @@ export function useLocation(link?: HateoasLink, locationId?: string) {
   const expendLink = resolveUrlTemplate({ "locationId": locationId! }, link!)
   return useQuery<LocationResponse>({
     queryKey: ["location", locationId],
-    queryFn: () => locationService.getLocation(expendLink, { "X-Actor-Id": "seller-001" }),
+    queryFn: () => locationService.getLocation(expendLink),
     enabled: !!link && !!locationId,
   });
 }
@@ -32,7 +33,7 @@ export function useLocation(link?: HateoasLink, locationId?: string) {
 export function useCreateLocationMutation() {
   const queryClient = useQueryClient();
   return useMutation<LocationResponse, Error, { link: HateoasLink, request: CreateLocationRequest }>({
-    mutationFn: ({ link: locationsLink, request }) => locationService.createLocation(locationsLink, request, { "X-Actor-Id": "seller-001" }),
+    mutationFn: ({ link: locationsLink, request }) => locationService.createLocation(locationsLink, request),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["locations"] });
     },
@@ -75,7 +76,7 @@ export function useDeactivateLocationMutation() {
 export function useDeleteLocationMutation() {
   const queryClient = useQueryClient();
   return useMutation<void, Error, HateoasLink>({
-    mutationFn: (link) => locationService.removeLocation(link, { "X-Actor-Id": "seller-001" }),
+    mutationFn: (link) => locationService.removeLocation(link),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["locations"] });
     },

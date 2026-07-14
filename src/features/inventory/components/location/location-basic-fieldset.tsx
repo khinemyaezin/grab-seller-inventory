@@ -14,7 +14,7 @@ import { Field, FieldDescription, FieldGroup, FieldLabel, FieldLegend, FieldSepa
 export type LocationFormProps = {
 }
 
-const LOCATION_TYPES: LocationType[] = ["WAREHOUSE", "STORE", "DISTRIBUTION_CENTER"];
+const LOCATION_TYPES: LocationType[] = ["WAREHOUSE", "STORE"];
 
 
 export function LocationBasicFieldSet({ }: LocationFormProps) {

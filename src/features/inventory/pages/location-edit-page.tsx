@@ -33,7 +33,7 @@ export default function EditLocationPage() {
   };
 
   return (
-    <div className="container mx-auto max-w-5xl p-6">
+    <div className="container mx-auto max-w-2xl p-6">
       <Header
         title={`Edit Location`}
         description="Update location details and manage zones."

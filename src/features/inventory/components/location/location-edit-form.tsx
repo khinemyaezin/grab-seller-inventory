@@ -52,7 +52,7 @@ export default function LocationEditForm({ locationId, onLifecycleEvent }: Locat
     });
     const { handleSubmit, reset, formState: { isDirty } } = form;
 
-    const { data: location } = useLocation(locationLink, locationId)
+    const { data: location, refetch } = useLocation(locationLink, locationId)
     const updateMutation = useUpdateLocationMutation();
     const activateMutation = useActivateLocationMutation();
     const deactivateMutation = useDeactivateLocationMutation();
@@ -60,10 +60,6 @@ export default function LocationEditForm({ locationId, onLifecycleEvent }: Locat
     const updateLink = resolveLink(location?._links, "edit-location");
     const activateLink = resolveLink(location?._links, "activate-location");
     const deactivateLink = resolveLink(location?._links, "deactivate-location");
-
-    if (!locationLink) return null;
-
-    console.log(location)
 
     useEffect(() => {
         if (location?.name) {
@@ -97,6 +93,7 @@ export default function LocationEditForm({ locationId, onLifecycleEvent }: Locat
                     },
                 },
             });
+            refetch();
             onLifecycleEvent?.({ type: "updated" });
         } catch {
             onLifecycleEvent?.({ type: "updateFailed" });
@@ -107,6 +104,7 @@ export default function LocationEditForm({ locationId, onLifecycleEvent }: Locat
         if (!link) return;
         try {
             await activateMutation.mutateAsync(link);
+            refetch();
             onLifecycleEvent?.({ type: "activated" });
         } catch {
             onLifecycleEvent?.({ type: "activateFailed" });
@@ -117,11 +115,14 @@ export default function LocationEditForm({ locationId, onLifecycleEvent }: Locat
         if (!link) return;
         try {
             await deactivateMutation.mutateAsync(link);
+            refetch();
             onLifecycleEvent?.({ type: "deactivated" });
         } catch {
             onLifecycleEvent?.({ type: "deactivateFailed" });
         }
     };
+
+    if (!locationLink) return null;
 
     return (
         <FormProvider {...form}>

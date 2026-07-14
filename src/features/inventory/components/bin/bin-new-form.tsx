@@ -12,7 +12,6 @@ import BinFieldSet from "./bin-fieldset";
 
 export type BinNewFormProps = {
   link: HateoasLink;
-  locationId: string;
   zoneId: string;
   onLifecycleEvent?: (event: BinLifecycleEvent) => void;
 };
@@ -23,22 +22,21 @@ const DEFAULT_FORM_VALUES: BinFormValues = {
   maxCapacity: 1,
 };
 
-export default function BinNewForm({ link, locationId, zoneId, onLifecycleEvent }: BinNewFormProps) {
-  const navigate = useNavigate();
+export default function BinNewForm({ link, zoneId, onLifecycleEvent }: BinNewFormProps) {
   const form = useForm<BinFormValues>({
     defaultValues: DEFAULT_FORM_VALUES,
     mode: "onSubmit",
   });
 
-  const { handleSubmit, formState: { isDirty } } = form;
+  const { handleSubmit, reset, formState: { isDirty } } = form;
   const createBinMutation = useCreateBinMutation();
 
   const handleOnSubmit = async (value: BinFormValues) => {
     if (!link) return;
     try {
       await createBinMutation.mutateAsync({ link, request: { ...value, zoneId } });
+      reset(DEFAULT_FORM_VALUES);
       onLifecycleEvent?.({ type: "created" });
-      navigate(routes.zones(locationId));
     } catch {
       onLifecycleEvent?.({ type: "createFailed" });
     }
@@ -56,16 +54,16 @@ export default function BinNewForm({ link, locationId, zoneId, onLifecycleEvent 
               {isDirty && (
                 <Button type="submit" disabled={createBinMutation.isPending || createBinMutation.isSuccess}>
                   <ButtonStatus
-                      status={
-                          createBinMutation.isPending
-                              ? "pending"
-                              : createBinMutation.isSuccess
-                                  ? "success"
-                                  : "idle"
-                      }
-                      pendingLabel="Saving…"
-                      successLabel="Saved">
-                      Save
+                    status={
+                      createBinMutation.isPending
+                        ? "pending"
+                        : createBinMutation.isSuccess
+                          ? "success"
+                          : "idle"
+                    }
+                    pendingLabel="Saving…"
+                    successLabel="Saved">
+                    Save
                   </ButtonStatus>
                 </Button>
               )}

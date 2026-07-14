@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router";
+import { Navigate, Route, Routes } from "react-router";
 import LocationsPage from "@/features/inventory/pages/location-list-page";
 import NewLocationPage from "@/features/inventory/pages/locaiton-new-page";
 import EditLocationPage from "@/features/inventory/pages/location-edit-page";
@@ -28,6 +28,7 @@ export default function AppRoutes({ link, platform }: {
             <Route path=":locationId/zones/new" element={<NewZonePage />} />
             <Route path=":locationId/zones/:zoneId" element={<EditZonePage />} />
             <Route path=":locationId/zones/:zoneId/bins/new" element={<NewBinPage />} />
+            <Route path=":locationId/zones/:zoneId/bins" element={<Navigate to="../.." relative="path"></Navigate>} />
             <Route path=":locationId/zones/:zoneId/bins/:binId" element={<EditBinPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>

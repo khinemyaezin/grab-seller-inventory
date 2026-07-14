@@ -15,8 +15,9 @@ export type LocationFormValues = {
 };
 
 export type LocationsFilterForm = {
-  
-}
+  active?: boolean;
+  type?: LocationType;
+};
 
 export type ZoneFormValues = {
     code: string;
