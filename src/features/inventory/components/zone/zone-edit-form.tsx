@@ -1,19 +1,19 @@
 
 import { useUpdateZoneMutation, useActivateZoneMutation, useDeactivateZoneMutation, useZone } from "@/features/inventory/hooks/use-zones";
-import type { HateoasLink } from "@/types";
+import type { HateoasLink, ZoneLifecycleEvent } from "@/types";
 import type { ZoneFormValues } from "@/features/inventory/types";
 import { useEffect } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { toast } from "sonner";
 import ZoneFieldSet from "./zone-fieldset";
-import { Card, CardContent, CardFooter } from "@grab/seller-ui/components/card";
-import { ButtonGroup } from "@grab/seller-ui/components/button-group";
-import { Button } from "@grab/seller-ui/components/index";
-import { resolveLink } from "@grab/seller-api";
+import { Card, CardContent, CardFooter } from "@khinemyaezin/seller-ui/components/card";
+import { ButtonGroup } from "@khinemyaezin/seller-ui/components/button-group";
+import { Button, ButtonStatus } from "@khinemyaezin/seller-ui/components/index";
+import { resolveLink } from "@khinemyaezin/seller-api";
 
 export type ZoneEditFormProps = {
     link: HateoasLink,
-    id: string
+    id: string,
+    onLifecycleEvent?: (event: ZoneLifecycleEvent) => void;
 }
 
 const DEFAULT_FORM_VALUES: ZoneFormValues = {
@@ -23,7 +23,7 @@ const DEFAULT_FORM_VALUES: ZoneFormValues = {
     active: true
 }
 
-export default function ZoneEditForm({ link, id }: ZoneEditFormProps) {
+export default function ZoneEditForm({ link, id, onLifecycleEvent }: ZoneEditFormProps) {
     const form = useForm<ZoneFormValues>({
         defaultValues: DEFAULT_FORM_VALUES,
         mode: "onSubmit",
@@ -40,6 +40,12 @@ export default function ZoneEditForm({ link, id }: ZoneEditFormProps) {
     const deactivateZoneMutation = useDeactivateZoneMutation();
 
     useEffect(() => {
+        if (zone?.name) {
+            onLifecycleEvent?.({ type: "titleResolved", title: zone.name });
+        }
+    }, [zone?.name, onLifecycleEvent]);
+
+    useEffect(() => {
         if (zone) {
             reset({ ...zone });
         }
@@ -49,9 +55,9 @@ export default function ZoneEditForm({ link, id }: ZoneEditFormProps) {
         if (!editZoneLink) return;
         try {
             await updateZoneMutation.mutateAsync({ link: editZoneLink, request: { ...value } });
-            toast.success("Zone updated", { position: "top-center" });
+            onLifecycleEvent?.({ type: "updated" });
         } catch {
-            toast.error("Failed to update zone", { position: "top-center" });
+            onLifecycleEvent?.({ type: "updateFailed" });
         }
     }
 
@@ -59,9 +65,9 @@ export default function ZoneEditForm({ link, id }: ZoneEditFormProps) {
         if (!activateZoneLink) return;
         try {
             await activateZoneMutation.mutateAsync(activateZoneLink);
-            toast.success("Zone activated", { position: "top-center" });
+            onLifecycleEvent?.({ type: "activated" });
         } catch {
-            toast.error("Failed to activate zone", { position: "top-center" });
+            onLifecycleEvent?.({ type: "activateFailed" });
         }
     }
 
@@ -69,9 +75,9 @@ export default function ZoneEditForm({ link, id }: ZoneEditFormProps) {
         if (!deactivateZoneLink) return;
         try {
             await deactivateZoneMutation.mutateAsync(deactivateZoneLink);
-            toast.success("Zone deactivated", { position: "top-center" });
+            onLifecycleEvent?.({ type: "deactivated" });
         } catch {
-            toast.error("Failed to deactivate zone", { position: "top-center" });
+            onLifecycleEvent?.({ type: "deactivateFailed" });
         }
     }
 
@@ -83,18 +89,34 @@ export default function ZoneEditForm({ link, id }: ZoneEditFormProps) {
                         <ZoneFieldSet />
                     </CardContent>
                     <CardFooter className="flex justify-end border-t">
+
                         <ButtonGroup>
-                            {activateZoneLink && (
-                                <Button type="button" disabled={activateZoneMutation.isPending} onClick={handleOnActivate}>Activate</Button>
-                            )}
-                            {deactivateZoneLink && (
-                                <Button type="button" variant="destructive" disabled={deactivateZoneMutation.isPending} onClick={handleOnDeactivate}>Deactivate</Button>
-                            )}
-                            {isDirty && editZoneLink && (
-                                <Button type="submit" disabled={updateZoneMutation.isPending}>
-                                    Update
-                                </Button>
-                            )}
+                            <ButtonGroup>
+                                {activateZoneLink && (
+                                    <Button type="button" variant="outline" disabled={activateZoneMutation.isPending} onClick={handleOnActivate}>Activate</Button>
+                                )}
+                                {deactivateZoneLink && (
+                                    <Button type="button" variant="destructive" disabled={deactivateZoneMutation.isPending} onClick={handleOnDeactivate}>Deactivate</Button>
+                                )}
+                            </ButtonGroup>
+                            <ButtonGroup>
+                                {isDirty && editZoneLink && (
+                                    <Button type="submit" disabled={updateZoneMutation.isPending || updateZoneMutation.isSuccess}>
+                                        <ButtonStatus
+                                            status={
+                                                updateZoneMutation.isPending
+                                                    ? "pending"
+                                                    : updateZoneMutation.isSuccess
+                                                        ? "success"
+                                                        : "idle"
+                                            }
+                                            pendingLabel="Saving…"
+                                            successLabel="Saved">
+                                            Update
+                                        </ButtonStatus>
+                                    </Button>
+                                )}
+                            </ButtonGroup>
                         </ButtonGroup>
                     </CardFooter>
                 </Card>

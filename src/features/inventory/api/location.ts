@@ -1,12 +1,13 @@
-import { api } from "@grab/seller-api";
-import type { HateoasLink } from "@grab/seller-api";
+import { api } from "@khinemyaezin/seller-api";
+import type { HateoasLink } from "@khinemyaezin/seller-api";
 import type {
   LocationResponse,
   LocationsResponse,
   CreateLocationRequest,
   UpdateLocationRequest,
-  LocationType,
+  LocationsFilterForm,
 } from "@/features/inventory/types";
+import type { Pageable } from "@khinemyaezin/seller-api";
 
 export const locationService = {
   createLocation: (link: HateoasLink, request: CreateLocationRequest, headers?: Record<string, string>) =>
@@ -18,13 +19,9 @@ export const locationService = {
   getLocationByCode: (link: HateoasLink, headers?: Record<string, string>) =>
     api.followLink<LocationResponse>(link, "GET", undefined, undefined, headers),
 
-  listLocations: (link: HateoasLink, filters?: { active?: boolean; type?: LocationType; page?: number; size?: number }, headers?: Record<string, string>) => {
-    const params: Record<string, string> = {};
-    if (filters?.active !== undefined) params.active = String(filters.active);
-    if (filters?.type) params.type = filters.type;
-    if (filters?.page !== undefined) params.page = String(filters.page);
-    if (filters?.size !== undefined) params.size = String(filters.size);
-    return api.followLink<LocationsResponse>(link, "GET", undefined, params, headers);
+  searchLocations: (link: HateoasLink, filters?: LocationsFilterForm & Pageable) => {
+   
+    return api.followLink<LocationsResponse>(link, "POST", filters);
   },
 
   removeLocation: (link: HateoasLink, headers?: Record<string, string>) =>

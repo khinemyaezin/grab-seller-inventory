@@ -1,20 +1,19 @@
 
-import { Button } from "@grab/seller-ui/components/index";
-import { ButtonGroup } from "@grab/seller-ui/components/button-group";
-import { Card, CardContent, CardFooter } from "@grab/seller-ui/components/card";
+import { Button, ButtonStatus } from "@khinemyaezin/seller-ui/components/index";
+import { ButtonGroup } from "@khinemyaezin/seller-ui/components/button-group";
+import { Card, CardContent, CardFooter } from "@khinemyaezin/seller-ui/components/card";
 import { useCreateBinMutation } from "@/features/inventory/hooks/use-bins";
-import { routes } from "@grab/seller-contracts";
-import type { HateoasLink } from "@/types";
+import { routes } from "@khinemyaezin/seller-contracts";
+import type { HateoasLink, BinLifecycleEvent } from "@/types";
 import type { BinFormValues } from "@/features/inventory/types";
 import { useNavigate } from "react-router";
 import { FormProvider, useForm } from "react-hook-form";
-import { toast } from "sonner";
 import BinFieldSet from "./bin-fieldset";
 
 export type BinNewFormProps = {
   link: HateoasLink;
-  locationId: string;
   zoneId: string;
+  onLifecycleEvent?: (event: BinLifecycleEvent) => void;
 };
 
 const DEFAULT_FORM_VALUES: BinFormValues = {
@@ -23,24 +22,23 @@ const DEFAULT_FORM_VALUES: BinFormValues = {
   maxCapacity: 1,
 };
 
-export default function BinNewForm({ link, locationId, zoneId }: BinNewFormProps) {
-  const navigate = useNavigate();
+export default function BinNewForm({ link, zoneId, onLifecycleEvent }: BinNewFormProps) {
   const form = useForm<BinFormValues>({
     defaultValues: DEFAULT_FORM_VALUES,
     mode: "onSubmit",
   });
 
-  const { handleSubmit, formState: { isDirty } } = form;
+  const { handleSubmit, reset, formState: { isDirty } } = form;
   const createBinMutation = useCreateBinMutation();
 
   const handleOnSubmit = async (value: BinFormValues) => {
     if (!link) return;
     try {
       await createBinMutation.mutateAsync({ link, request: { ...value, zoneId } });
-      toast.success("Bin created", { position: "top-center" });
-      navigate(routes.zones(locationId));
+      reset(DEFAULT_FORM_VALUES);
+      onLifecycleEvent?.({ type: "created" });
     } catch {
-      toast.error("Failed to create bin", { position: "top-center" });
+      onLifecycleEvent?.({ type: "createFailed" });
     }
   };
 
@@ -51,11 +49,22 @@ export default function BinNewForm({ link, locationId, zoneId }: BinNewFormProps
           <CardContent>
             <BinFieldSet />
           </CardContent>
-          <CardFooter>
+          <CardFooter className="flex justify-end">
             <ButtonGroup>
               {isDirty && (
-                <Button type="submit" disabled={createBinMutation.isPending}>
-                  Save
+                <Button type="submit" disabled={createBinMutation.isPending || createBinMutation.isSuccess}>
+                  <ButtonStatus
+                    status={
+                      createBinMutation.isPending
+                        ? "pending"
+                        : createBinMutation.isSuccess
+                          ? "success"
+                          : "idle"
+                    }
+                    pendingLabel="Saving…"
+                    successLabel="Saved">
+                    Save
+                  </ButtonStatus>
                 </Button>
               )}
             </ButtonGroup>

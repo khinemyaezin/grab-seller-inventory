@@ -1,7 +1,6 @@
 
 import { useReducer, useCallback } from "react";
 import { UseMutationResult } from "@tanstack/react-query";
-import { toast } from "sonner";
 import type { HateoasLink } from "@/types";
 
 type ActionType = "activate" | "deactivate" | "delete";
@@ -38,6 +37,7 @@ interface EntityActionsConfig {
   deactivate: UseMutationResult<unknown, Error, HateoasLink>;
   delete: UseMutationResult<unknown, Error, HateoasLink>;
   entityName: string;
+  onLifecycleEvent?: (event: { type: "activated" | "activateFailed" | "deactivated" | "deactivateFailed" | "deleted" | "deleteFailed" }) => void;
 }
 
 export function useEntityActions(config: EntityActionsConfig) {
@@ -52,14 +52,18 @@ export function useEntityActions(config: EntityActionsConfig) {
       dispatch({ type: "START", actionType });
       try {
         await mutation.mutateAsync(link);
-        toast.success(messages.success, { position: "top-center" });
         dispatch({ type: "SUCCESS" });
+        if (actionType === "activate") config.onLifecycleEvent?.({ type: "activated" });
+        if (actionType === "deactivate") config.onLifecycleEvent?.({ type: "deactivated" });
+        if (actionType === "delete") config.onLifecycleEvent?.({ type: "deleted" });
       } catch {
-        toast.error(messages.error, { position: "top-center" });
         dispatch({ type: "ERROR", error: messages.error?? "" });
+        if (actionType === "activate") config.onLifecycleEvent?.({ type: "activateFailed" });
+        if (actionType === "deactivate") config.onLifecycleEvent?.({ type: "deactivateFailed" });
+        if (actionType === "delete") config.onLifecycleEvent?.({ type: "deleteFailed" });
       }
     },
-    [config.entityName]
+    [config]
   );
 
   const handleActivate = useCallback(

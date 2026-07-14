@@ -1,15 +1,15 @@
 
 import { binService } from "@/features/inventory/api/bin";
-import { resolveUrlTemplate } from "@grab/seller-api";
-import type { HateoasLink } from "@grab/seller-api";
-import type { CreateBinRequest, UpdateBinRequest } from "@/features/inventory/types";
+import { resolveUrlTemplate } from "@khinemyaezin/seller-api";
+import type { HateoasLink, Pageable } from "@khinemyaezin/seller-api";
+import type { BinsFilterForm, CreateBinRequest, UpdateBinRequest } from "@/features/inventory/types";
 import type { BinResponse, ListBinResponse } from "@/features/inventory/types/inventory.response";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-export function useBins(link?: HateoasLink, zoneId?: string) {
+export function useBins(link?: HateoasLink, zoneId?: string, filter?: BinsFilterForm & Pageable) {
   return useQuery<ListBinResponse>({
-    queryKey: ["bins", zoneId],
-    queryFn: () => binService.listBins(link!),
+    queryKey: ["bins", zoneId, filter],
+    queryFn: () => binService.searchBins(link!, { page: 0, size: 20, ...filter, zoneId }),
     enabled: !!zoneId && !!link,
     staleTime: 1000 * 60 * 5,
   });

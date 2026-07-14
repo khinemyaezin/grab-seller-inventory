@@ -1,6 +1,6 @@
 
-import { Input } from "@grab/seller-ui/components/index"
-import { FieldSet, FieldGroup, Field, FieldLabel, FieldError } from "@grab/seller-ui/components/field"
+import { Input } from "@khinemyaezin/seller-ui/components/index"
+import { FieldSet, FieldGroup, Field, FieldLabel, FieldError } from "@khinemyaezin/seller-ui/components/field"
 import type { BinFormValues } from "@/features/inventory/types"
 import { useFormContext } from "react-hook-form"
 

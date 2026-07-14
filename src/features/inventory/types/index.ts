@@ -8,6 +8,9 @@ export type {
   BinResponse,
   Zone,
   LocationResponse,
+  LocationLifecycleEvent,
+  ZoneLifecycleEvent,
+  BinLifecycleEvent,
 } from "./inventory.model";
 
 // Request DTOs
@@ -29,5 +32,11 @@ export type {
 } from "./inventory.response";
 
 // Form Values
-export type { LocationFormValues, LocationsFilterForm, ZoneFormValues, BinFormValues } from "./inventory.form";
-
+export type {
+  LocationFormValues,
+  LocationsFilterForm,
+  ZoneFormValues,
+  ZonesFilterForm,
+  BinFormValues,
+  BinsFilterForm,
+} from "./inventory.form";

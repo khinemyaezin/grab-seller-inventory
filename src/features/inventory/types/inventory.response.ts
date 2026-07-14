@@ -1,4 +1,4 @@
-import type { HateoasLink, HateoasPageMetadata } from "@grab/seller-api";
+import type { HateoasLink, HateoasPageMetadata } from "@khinemyaezin/seller-api";
 import type { BinResponse, LocationResponse, Zone, ZoneType } from "./inventory.model";
 export type { BinResponse } from "./inventory.model";
 

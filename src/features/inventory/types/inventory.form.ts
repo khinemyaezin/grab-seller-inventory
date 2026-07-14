@@ -15,8 +15,10 @@ export type LocationFormValues = {
 };
 
 export type LocationsFilterForm = {
-  
-}
+  query?: string;
+  active?: boolean;
+  type?: LocationType;
+};
 
 export type ZoneFormValues = {
     code: string;
@@ -25,9 +27,22 @@ export type ZoneFormValues = {
     active?: boolean;
 }
 
+export type ZonesFilterForm = {
+    locationId?: string;
+    query?: string;
+    active?: boolean;
+    type?: ZoneType;
+};
+
 export type BinFormValues = {
     code: string;
     name: string;
     maxCapacity: number;
     active?: boolean;
 }
+
+export type BinsFilterForm = {
+    zoneId?: string;
+    query?: string;
+    active?: boolean;
+};

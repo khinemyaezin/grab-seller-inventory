@@ -1,6 +1,6 @@
 
-import { Card, CardContent } from "@grab/seller-ui/components/card";
-import { Badge } from "@grab/seller-ui/components/badge";
+import { Card, CardContent } from "@khinemyaezin/seller-ui/components/card";
+import { Badge } from "@khinemyaezin/seller-ui/components/badge";
 import { MapPinIcon, BuildingIcon } from "lucide-react";
 import type { LocationResponse } from "@/features/inventory/types";
 
@@ -45,7 +45,7 @@ export function LocationSummary({ location }: LocationSummaryProps) {
           <Badge variant="secondary">
             {location.type.replace(/_/g, " ")}
           </Badge>
-          <Badge variant={location.active ? "default" : "outline"}>
+          <Badge variant={location.active ? "success" : "secondary"}>
             {location.active ? "Active" : "Inactive"}
           </Badge>
         </div>
