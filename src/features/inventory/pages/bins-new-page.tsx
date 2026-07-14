@@ -1,5 +1,5 @@
 
-import { Button } from "@khinemyaezin/seller-ui/components/index";
+import { Button, PageLoadingSkeleton } from "@khinemyaezin/seller-ui/components/index";
 import { Header } from "@khinemyaezin/seller-ui/layout/header";
 import { Link, useParams } from "react-router";
 import { ArrowLeftIcon } from "lucide-react";
@@ -49,7 +49,7 @@ export default function NewBinPage() {
         description="Create a new bin in this zone."
       >
         <ButtonGroup>
-          <Button variant="secondary" size="icon" type="button">
+          <Button variant="secondary" size="icon" type="button" asChild>
             <Link to={{
               pathname: "../../..",
               search: `?active=${zoneId}`,
@@ -60,8 +60,10 @@ export default function NewBinPage() {
           </Button>
         </ButtonGroup>
       </Header>
-      {createBinLink && (
+      {createBinLink ? (
         <BinNewForm link={createBinLink} zoneId={zoneId} onLifecycleEvent={handleEvent} />
+      ) : (
+        <PageLoadingSkeleton rows={2} />
       )}
     </div>
   );

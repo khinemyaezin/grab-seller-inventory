@@ -49,7 +49,7 @@ export default function BinNewForm({ link, zoneId, onLifecycleEvent }: BinNewFor
           <CardContent>
             <BinFieldSet />
           </CardContent>
-          <CardFooter>
+          <CardFooter className="flex justify-end">
             <ButtonGroup>
               {isDirty && (
                 <Button type="submit" disabled={createBinMutation.isPending || createBinMutation.isSuccess}>

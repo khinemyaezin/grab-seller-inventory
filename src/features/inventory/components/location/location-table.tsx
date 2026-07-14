@@ -29,7 +29,7 @@ export type LocationTableProps = {
 };
 
 export default function LocationTable({ filter, onPageChange, onLifecycleEvent }: LocationTableProps) {
-  const pagedLocationLink = useInventoryLink("pagedLocation");
+  const pagedLocationLink = useInventoryLink("searchLocation");
   const { data } = useLocations(pagedLocationLink, filter);
   const locations = data?._embedded?.locationResponseList ?? [];
   const showPagination = (data?.page.totalPages ?? 0) > 1;

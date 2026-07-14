@@ -4,12 +4,12 @@ export type LocationType = "WAREHOUSE" | "STORE";
 
 export type ZoneType = "PICKING" | "STORAGE" | "STAGING" | "RETURNS" | "DAMAGED" | "RECEIVING";
 
-export const ZONE_TYPES: ZoneType[] = ["PICKING" , "STORAGE" , "STAGING" , "RETURNS" , "DAMAGED" , "RECEIVING"];
+export const ZONE_TYPES: ZoneType[] = ["PICKING", "STORAGE", "STAGING", "RETURNS", "DAMAGED", "RECEIVING"];
 
 export interface InventoryRoot {
   self?: HateoasLink;
-  pagedLocation?: HateoasLink;
-  location?:  HateoasLink;
+  searchLocation?: HateoasLink;
+  location?: HateoasLink;
   createLocation?: HateoasLink;
 }
 

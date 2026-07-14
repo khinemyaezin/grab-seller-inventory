@@ -1,11 +1,11 @@
 import { api } from "@khinemyaezin/seller-api";
-import type { HateoasLink } from "@khinemyaezin/seller-api";
-import type { CreateBinRequest, UpdateBinRequest } from "@/features/inventory/types";
+import type { HateoasLink, Pageable } from "@khinemyaezin/seller-api";
+import type { BinsFilterForm, CreateBinRequest, UpdateBinRequest } from "@/features/inventory/types";
 import type { BinResponse, ListBinResponse } from "@/features/inventory/types/inventory.response";
 
 export const binService = {
-  listBins: (link: HateoasLink, headers?: Record<string, string>) =>
-    api.followLink<ListBinResponse>(link, "GET", undefined, undefined, headers),
+  searchBins: (link: HateoasLink, filters?: BinsFilterForm & Pageable, headers?: Record<string, string>) =>
+    api.followLink<ListBinResponse>(link, "POST", filters, undefined, headers),
 
   getBin: (link: HateoasLink, headers?: Record<string, string>) =>
     api.followLink<BinResponse>(link, "GET", undefined, undefined, headers),

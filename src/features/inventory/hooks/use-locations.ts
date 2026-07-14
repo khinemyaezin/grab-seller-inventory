@@ -15,7 +15,7 @@ import type { Pageable } from "@khinemyaezin/seller-api";
 export function useLocations(locationsLink?: HateoasLink, filters?: LocationsFilterForm & Pageable) {
   return useQuery<LocationsResponse>({
     queryKey: ["locations", locationsLink?.href, filters],
-    queryFn: () => locationService.listLocations(locationsLink!, filters),
+    queryFn: () => locationService.searchLocations(locationsLink!, filters),
     enabled: !!locationsLink,
     staleTime: 1000 * 60 * 5,
   });

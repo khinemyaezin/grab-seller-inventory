@@ -27,13 +27,14 @@ export default function ZoneNewForm({ link, onLifecycleEvent }: ZoneNewFormProps
         mode: "onSubmit",
     });
 
-    const { handleSubmit, formState: { isDirty } } = form;
+    const { handleSubmit, reset, formState: { isDirty } } = form;
     const createZoneMutation = useAddZoneMutation()
 
     const handleOnSubmit = async (value: ZoneFormValues) => {
         if(!link) return;
         try {
             await createZoneMutation.mutateAsync({ link: link, request: { ...value } });
+            reset(DEFAULT_FORM_VALUES);
             onLifecycleEvent?.({ type: "created" });
         } catch {
             onLifecycleEvent?.({ type: "createFailed" });
@@ -47,7 +48,7 @@ export default function ZoneNewForm({ link, onLifecycleEvent }: ZoneNewFormProps
                     <CardContent>
                         <ZoneFieldSet />
                     </CardContent>
-                    <CardFooter>
+                    <CardFooter className="flex justify-end">
                         <ButtonGroup>
                             {isDirty && (
                                 <Button type="submit" disabled={createZoneMutation.isPending || createZoneMutation.isSuccess}>

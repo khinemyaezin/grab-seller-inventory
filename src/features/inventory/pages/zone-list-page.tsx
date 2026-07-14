@@ -21,7 +21,7 @@ export default function ZonesPage() {
   const locationLink = useInventoryLink("location");
   const { data: location } = useLocation(locationLink, id);
 
-  const pagedZone = resolveLink(location?._links, "paged-zone");
+  const pagedZone = resolveLink(location?._links, "search-zones");
   const createZone = resolveLink(location?._links, "create-zone");
   const platform = usePlatform();
 

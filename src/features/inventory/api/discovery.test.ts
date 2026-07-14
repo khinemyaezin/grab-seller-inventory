@@ -10,14 +10,14 @@ describe("inventory discovery", () => {
     server.use(http.get("http://api.test/inventory", () => HttpResponse.json({
       _links: {
         self: { href: "/inventory" },
-        "paged-location": { href: "/inventory/locations" },
+        "search-locations": { href: "/inventory/locations/search" },
         location: { href: "/inventory/locations/{locationId}", templated: true },
         "create-location": { href: "/inventory/locations" },
       },
     }, { headers: { "content-type": "application/hal+json" } })));
 
     const root = await fetchInventoryRoot({ href: "/inventory" });
-    expect(root.pagedLocation?.href).toBe("/inventory/locations");
+    expect(root.searchLocation?.href).toBe("/inventory/locations/search");
     expect(root.location?.templated).toBe(true);
   });
 });

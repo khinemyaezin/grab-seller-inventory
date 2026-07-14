@@ -32,5 +32,11 @@ export type {
 } from "./inventory.response";
 
 // Form Values
-export type { LocationFormValues, LocationsFilterForm, ZoneFormValues, BinFormValues } from "./inventory.form";
-
+export type {
+  LocationFormValues,
+  LocationsFilterForm,
+  ZoneFormValues,
+  ZonesFilterForm,
+  BinFormValues,
+  BinsFilterForm,
+} from "./inventory.form";

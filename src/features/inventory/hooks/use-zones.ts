@@ -1,15 +1,15 @@
 
 import { zoneService } from "@/features/inventory/api/zone";
 import { resolveUrlTemplate } from "@khinemyaezin/seller-api";
-import type { HateoasLink } from "@khinemyaezin/seller-api";
-import { CreateZoneRequest, ListZoneResponse, UpdateZoneRequest } from "@/features/inventory/types";
+import type { HateoasLink, Pageable } from "@khinemyaezin/seller-api";
+import { CreateZoneRequest, ListZoneResponse, UpdateZoneRequest, ZonesFilterForm } from "@/features/inventory/types";
 import { ZoneResponse } from "@/features/inventory/types/inventory.response";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-export function useZones(link?: HateoasLink, locationId?: string, filter?: { page?: number; size?: number }) {
+export function useZones(link?: HateoasLink, locationId?: string, filter?: ZonesFilterForm & Pageable) {
   return useQuery<ListZoneResponse>({
-    queryKey: ["zones", locationId],
-    queryFn: () => zoneService.listZone(link!),
+    queryKey: ["zones", locationId, filter],
+    queryFn: () => zoneService.searchZones(link!, { page: 0, size: 20, ...filter, locationId }),
     enabled: !!locationId && !!link,
     staleTime: 1000 * 60 * 5,
   });

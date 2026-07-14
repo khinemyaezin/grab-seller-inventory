@@ -132,7 +132,7 @@ export default function LocationEditForm({ locationId, onLifecycleEvent }: Locat
                     <CardContent>
                         <LocationBasicFieldSet />
                     </CardContent>
-                    <CardFooter className="flex justify-end border-t">
+                    <CardFooter className="flex justify-end">
                         <ButtonGroup>
                             <ButtonGroup>
                                 {activateLink && (

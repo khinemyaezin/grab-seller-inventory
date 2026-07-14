@@ -13,21 +13,17 @@ import { resolveLink } from "@khinemyaezin/seller-api";
 import { ZoneLifecycleEvent } from "@/types";
 import { usePlatform, useShellBreadcrumbSegment } from "@khinemyaezin/seller-ui";
 
-type NewZonePageProps = {
-    params: Promise<{ id: string }>;
-};
 
 export default function NewZonePage() {
     const { locationId } = useParams<{ locationId: string }>();
-    if (!locationId) throw new Error("Missing locationId route parameter");
+    if (!locationId)
+        throw new Error("Missing locationId route parameter");
     const id = locationId;
     const locationLink = useInventoryLink("location");
+    const platform = usePlatform();
     const { data: location } = useLocation(locationLink, id);
-    const navigate = useNavigate();
-
     const createZoneLink = resolveLink(location?._links, "create-zone");
 
-    const platform = usePlatform();
     useShellBreadcrumbSegment(":locationId", location?.name);
     const toast = (type: "success" | "error", message: string) =>
         platform?.events.publish("shell:toast:v1", { type, message, position: "top-center" });
@@ -36,7 +32,6 @@ export default function NewZonePage() {
         switch (event.type) {
             case "created":
                 toast("success", "Zone created successfully");
-                navigate("..");
                 break;
             case "createFailed":
                 toast("error", "Failed to create zone");

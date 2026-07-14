@@ -32,7 +32,7 @@ export default function LocationNewForm({ onLifecycleEvent }: LocationNewFormPro
         defaultValues: DEFAULT_FORM_VALUES,
         mode: "onSubmit",
     });
-    const { handleSubmit, formState: { isDirty } } = form;
+    const { handleSubmit, reset, formState: { isDirty } } = form;
     const createLocationMutation = useCreateLocationMutation();
 
     const handleFormSubmit = async (values: LocationFormValues) => {
@@ -53,6 +53,7 @@ export default function LocationNewForm({ onLifecycleEvent }: LocationNewFormPro
 
         try {
             await createLocationMutation.mutateAsync({link: createLocationLink, request: payload});
+            reset(DEFAULT_FORM_VALUES);
             onLifecycleEvent?.({ type: "created" });
         } catch {
             onLifecycleEvent?.({ type: "createFailed" });
@@ -70,7 +71,7 @@ export default function LocationNewForm({ onLifecycleEvent }: LocationNewFormPro
                         <LocationBasicFieldSet />
                     </CardContent>
                     {isDirty && (
-                        <CardFooter className="flex justify-end border-t">
+                        <CardFooter className="flex justify-end">
                             <ButtonGroup>
                                 <ButtonGroup>
 

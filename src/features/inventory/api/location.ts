@@ -19,13 +19,9 @@ export const locationService = {
   getLocationByCode: (link: HateoasLink, headers?: Record<string, string>) =>
     api.followLink<LocationResponse>(link, "GET", undefined, undefined, headers),
 
-  listLocations: (link: HateoasLink, filters?: LocationsFilterForm & Pageable, headers?: Record<string, string>) => {
-    const params: Record<string, string> = {};
-    if (filters?.active !== undefined) params.active = String(filters.active);
-    if (filters?.type) params.type = filters.type;
-    if (filters?.page !== undefined) params.page = String(filters.page);
-    if (filters?.size !== undefined) params.size = String(filters.size);
-    return api.followLink<LocationsResponse>(link, "GET", undefined, params, headers);
+  searchLocations: (link: HateoasLink, filters?: LocationsFilterForm & Pageable) => {
+   
+    return api.followLink<LocationsResponse>(link, "POST", filters);
   },
 
   removeLocation: (link: HateoasLink, headers?: Record<string, string>) =>

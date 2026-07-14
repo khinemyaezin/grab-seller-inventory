@@ -106,7 +106,7 @@ export default function BinEditForm({ link, id, onLifecycleEvent }: BinEditFormP
           <CardContent>
             <BinFieldSet />
           </CardContent>
-          <CardFooter className="flex justify-end border-t">
+          <CardFooter className="flex justify-end">
             <ButtonGroup>
               <ButtonGroup>
                 {activateBinLink && (
