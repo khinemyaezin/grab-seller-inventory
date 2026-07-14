@@ -12,9 +12,9 @@
   },
   "dependencies": {
     "@hookform/resolvers": "5.2.2",
-    "@khinemyaezin/seller-api": "^1.0.1-canary-c8afa68",
-    "@khinemyaezin/seller-contracts": "^1.0.1-canary-c8afa68",
-    "@khinemyaezin/seller-ui": "^1.0.1-canary-c8afa68",
+    "@khinemyaezin/seller-api": "^1.0.1-canary-2b737c3",
+    "@khinemyaezin/seller-contracts": "^1.0.1-canary-2b737c3",
+    "@khinemyaezin/seller-ui": "^1.0.1-canary-2b737c3",
     "@tailwindcss/vite": "^4.3.2",
     "@tanstack/react-query": "5.99.2",
     "lucide-react": "1.8.0",
