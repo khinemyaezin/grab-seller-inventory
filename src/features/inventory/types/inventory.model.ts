@@ -11,7 +11,54 @@ export interface InventoryRoot {
   searchLocation?: HateoasLink;
   location?: HateoasLink;
   createLocation?: HateoasLink;
+  searchInventoryItems?: HateoasLink;
+  createInventoryItem?: HateoasLink;
+  inventoryItem?: HateoasLink;
+  searchProductVariants?: HateoasLink;
 }
+
+export type InventoryStatus = "ACTIVE" | "DISCONTINUED" | "OUT_OF_STOCK" | "SUSPENDED";
+
+export const INVENTORY_STATUSES: InventoryStatus[] = [
+  "ACTIVE",
+  "DISCONTINUED",
+  "OUT_OF_STOCK",
+  "SUSPENDED",
+];
+
+export type ReceiveStockMovementType =
+  | "PURCHASE_ORDER_RECEIPT"
+  | "CUSTOMER_RETURN"
+  | "TRANSFER_IN"
+  | "INITIAL_STOCK";
+
+export const RECEIVE_STOCK_TYPES: ReceiveStockMovementType[] = [
+  "PURCHASE_ORDER_RECEIPT",
+  "CUSTOMER_RETURN",
+  "TRANSFER_IN",
+  "INITIAL_STOCK",
+];
+
+export type AdjustmentReason =
+  | "CYCLE_COUNT"
+  | "DAMAGED"
+  | "EXPIRED"
+  | "LOST"
+  | "FOUND"
+  | "THEFT"
+  | "CORRECTION";
+
+export const ADJUSTMENT_REASONS: AdjustmentReason[] = [
+  "CYCLE_COUNT",
+  "DAMAGED",
+  "EXPIRED",
+  "LOST",
+  "FOUND",
+  "THEFT",
+  "CORRECTION",
+];
+
+
 
 export interface LocationAddress {
   line1: string;
@@ -30,15 +77,6 @@ export interface Bin {
   active: boolean;
 }
 
-export interface BinResponse {
-  id: string;
-  zoneId: string;
-  code: string;
-  name: string;
-  maxCapacity: number;
-  active: boolean;
-  _links: Record<string, HateoasLink>;
-}
 
 export interface Zone {
   id: string;
@@ -48,15 +86,6 @@ export interface Zone {
   active: boolean;
 }
 
-export interface LocationResponse {
-  id: string;
-  code: string;
-  name: string;
-  type: LocationType;
-  active: boolean;
-  address: LocationAddress;
-  _links: Record<string, HateoasLink>;
-}
 
 export type LocationLifecycleEvent =
   | { type: "titleResolved", title: string }
@@ -96,3 +125,35 @@ export type BinLifecycleEvent =
   | { type: "deactivateFailed" }
   | { type: "deleted" }
   | { type: "deleteFailed" };
+
+export type ItemLifecycleEvent =
+  | { type: "titleResolved"; title: string }
+  | { type: "created" }
+  | { type: "createFailed"; message: string }
+  | { type: "received" }
+  | { type: "receiveFailed" }
+  | { type: "adjusted" }
+  | { type: "adjustFailed" };
+
+/** Gap kinds surfaced on the stock coverage page. */
+export type CoverageGapKind = "UNSTOCKED" | "ZERO_AVAILABLE" | "LOW_STOCK";
+
+export const COVERAGE_GAP_KINDS: CoverageGapKind[] = [
+  "UNSTOCKED",
+  "ZERO_AVAILABLE",
+  "LOW_STOCK",
+];
+
+export interface CoverageRow {
+  key: string;
+  sku: string;
+  productId?: string;
+  productName?: string;
+  productVariantId?: string | null;
+  locationId: string;
+  gap: CoverageGapKind;
+  available?: number;
+  reorderPoint?: number;
+  itemId?: string;
+}
+

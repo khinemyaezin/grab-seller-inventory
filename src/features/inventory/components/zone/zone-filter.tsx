@@ -12,40 +12,10 @@ const FIELDS: FilterField[] = [
   {
     type: "input",
     name: "query",
-    label: "Search",
+    label: "",
     placeholder: "Search zones",
     debounceMs: 300,
-  },
-  {
-    type: "select",
-    name: "active",
-    label: "Status",
-    placeholder: "Status",
-    groupLabel: "Zone Status",
-    options: [
-      { label: "All", value: ALL },
-      { label: "Active", value: "true" },
-      { label: "Inactive", value: "false" },
-    ],
-  },
-  {
-    type: "select",
-    name: "type",
-    label: "Type",
-    placeholder: "Type",
-    groupLabel: "Zone Type",
-    options: [
-      { label: "All", value: ALL },
-      ...ZONE_TYPES.map((type) => ({ label: formatZoneType(type), value: type })),
-    ],
-  },
-  {
-    type: "select",
-    name: "size",
-    label: "Rows",
-    placeholder: "Page size",
-    options: PAGE_SIZES.map((size) => ({ label: String(size), value: String(size) })),
-  },
+  }
 ];
 
 const DEFAULT_VALUES: FilterValues = {

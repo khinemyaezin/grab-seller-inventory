@@ -33,13 +33,15 @@ export default function BinNewForm({ link, zoneId, onLifecycleEvent }: BinNewFor
 
   const handleOnSubmit = async (value: BinFormValues) => {
     if (!link) return;
-    try {
-      await createBinMutation.mutateAsync({ link, request: { ...value, zoneId } });
-      reset(DEFAULT_FORM_VALUES);
-      onLifecycleEvent?.({ type: "created" });
-    } catch {
-      onLifecycleEvent?.({ type: "createFailed" });
-    }
+
+    createBinMutation.mutateAsync({ link, request: { ...value, zoneId } })
+      .then(() => {
+        reset(DEFAULT_FORM_VALUES);
+        createBinMutation.reset();
+        onLifecycleEvent?.({ type: "created" });
+      }).catch(() => {
+        onLifecycleEvent?.({ type: "createFailed" });
+      })
   };
 
   return (

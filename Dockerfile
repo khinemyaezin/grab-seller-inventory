@@ -13,8 +13,11 @@ RUN cd grab-seller-inventory \
 
 FROM nginx:1.27-alpine AS runtime
 
-COPY grab-seller-inventory/nginx.conf /etc/nginx/conf.d/default.conf
+COPY grab-seller-inventory/nginx.conf /etc/nginx/templates/default.conf.template
 COPY --from=build /workspace/grab-seller-inventory/dist /usr/share/nginx/html
+
+ENV API_UPSTREAM=host.docker.internal:8080 \
+    NGINX_ENVSUBST_FILTER=API_UPSTREAM
 
 EXPOSE 80
 

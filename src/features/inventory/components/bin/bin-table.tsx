@@ -4,8 +4,7 @@ import { Badge } from "@khinemyaezin/seller-ui/components/badge";
 import { BoxIcon, GaugeIcon, MoreHorizontalIcon, PackageIcon } from "lucide-react";
 import { hasLink, resolveLink } from "@khinemyaezin/seller-api";
 import { Link } from "react-router";
-import type { HateoasLink, BinLifecycleEvent } from "@/types";
-import type { BinResponse } from "@/features/inventory/types/inventory.model";
+import type { HateoasLink, BinLifecycleEvent, BinResponse } from "@/types";
 import { useBins, useActivateBinMutation, useDeactivateBinMutation, useDeleteBinMutation } from "@/features/inventory/hooks/use-bins";
 
 import {
