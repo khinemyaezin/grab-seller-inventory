@@ -22,11 +22,13 @@ export default function ItemNewPage() {
       case "createFailed":
         toast("error", event.message);
         break;
+      case "navigation":
+        navigate(`../${event.itemId}`)
     }
   };
 
   return (
-    <div className="container mx-auto max-w-2xl p-6">
+    <div className="container mx-auto max-w-xl p-6">
       <Header
         title="Add stock item"
         description="Provision inventory for a SKU at a location."

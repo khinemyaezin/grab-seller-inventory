@@ -46,6 +46,7 @@ export type {
   UpdateBinRequest,
   CreateInventoryRequest,
   SearchInventoryRequest,
+  CheckInventoryExistenceRequest,
   ReceiveStockRequest,
   AdjustStockRequest,
 } from "./inventory.request";
@@ -57,6 +58,8 @@ export type {
   ZoneResponse,
   ListBinResponse,
   InventoryItemsResponse,
+  CheckInventoryExistenceResponse,
+  InventoryExistenceItem,
   StockMovementsResponse,
   BinResponse,
   LocationResponse,

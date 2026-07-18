@@ -14,6 +14,7 @@ export interface InventoryRoot {
   searchInventoryItems?: HateoasLink;
   createInventoryItem?: HateoasLink;
   inventoryItem?: HateoasLink;
+  checkInventoryExistence?: HateoasLink;
   searchProductVariants?: HateoasLink;
 }
 
@@ -128,6 +129,7 @@ export type BinLifecycleEvent =
 
 export type ItemLifecycleEvent =
   | { type: "titleResolved"; title: string }
+  | { type: "navigation"; itemId:string }
   | { type: "created" }
   | { type: "createFailed"; message: string }
   | { type: "received" }
@@ -156,4 +158,3 @@ export interface CoverageRow {
   reorderPoint?: number;
   itemId?: string;
 }
-

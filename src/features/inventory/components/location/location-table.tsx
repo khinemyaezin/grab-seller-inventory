@@ -38,6 +38,7 @@ export default function LocationTable({ filter, onPageChange, onLifecycleEvent }
     <Table>
       <TableHeader>
         <TableRow>
+          <TableHead className="w-12">#</TableHead>
           <TableHead>Code</TableHead>
           <TableHead>Type</TableHead>
           <TableHead>Address</TableHead>
@@ -46,10 +47,11 @@ export default function LocationTable({ filter, onPageChange, onLifecycleEvent }
         </TableRow>
       </TableHeader>
       <TableBody>
-        {locations.length > 0 ? locations.map((location) => (
+        {locations.length > 0 ? locations.map((location, index) => (
           <LocationTableRow
             key={location.id}
             location={location}
+            index={data?.page ? data.page.number * data.page.size + index + 1 : index + 1}
             onLifecycleEvent={onLifecycleEvent}
           />
         )) : (
@@ -85,12 +87,12 @@ export default function LocationTable({ filter, onPageChange, onLifecycleEvent }
 }
 
 type LocationTableRowProps = {
-  location: LocationResponse,
+  location: LocationResponse;
+  index: number;
   onLifecycleEvent?: (event: LocationLifecycleEvent) => void;
-
 };
 
-function LocationTableRow({ location, onLifecycleEvent }: LocationTableRowProps) {
+function LocationTableRow({ location, index, onLifecycleEvent }: LocationTableRowProps) {
   const activateLink = resolveLink(location._links, "activate-location");
   const deactivateLink = resolveLink(location._links, "deactivate-location");
   const deleteLink = resolveLink(location._links, "delete-location");
@@ -98,7 +100,7 @@ function LocationTableRow({ location, onLifecycleEvent }: LocationTableRowProps)
   const deactivateMutation = useDeactivateLocationMutation();
   const deleteMutation = useDeleteLocationMutation();
 
-  const handleActivate = async (link: HateoasLink, messages: { success: string; error: string }) => {
+  const handleActivate = async (link: HateoasLink) => {
     try {
       await activateMutation.mutateAsync(link);
       onLifecycleEvent?.({ type: "activated" });
@@ -107,7 +109,7 @@ function LocationTableRow({ location, onLifecycleEvent }: LocationTableRowProps)
     }
   };
 
-  const handleDeactivate = async (link: HateoasLink, messages: { success: string; error: string }) => {
+  const handleDeactivate = async (link: HateoasLink) => {
     try {
       await deactivateMutation.mutateAsync(link);
       onLifecycleEvent?.({ type: "deactivated" });
@@ -127,6 +129,7 @@ function LocationTableRow({ location, onLifecycleEvent }: LocationTableRowProps)
 
   return (
     <TableRow>
+      <TableCell className="text-muted-foreground">{index}</TableCell>
       <TableCell className="grid grid-rows-2 gap-1">
         <span className="font-medium">
           {hasLink(location._links, "self") ? (
@@ -167,18 +170,12 @@ function LocationTableRow({ location, onLifecycleEvent }: LocationTableRowProps)
                 </DropdownMenuItem>
               )}
               {activateLink && (
-                <DropdownMenuItem onClick={() => handleActivate(activateLink, {
-                  success: "Successfully activated",
-                  error: `Failed to activate ${location.name}`
-                })}>
+                <DropdownMenuItem onClick={() => handleActivate(activateLink)}>
                   Activate
                 </DropdownMenuItem>
               )}
               {deactivateLink && (
-                <DropdownMenuItem onClick={() => handleDeactivate(deactivateLink, {
-                  success: "Successfully deactivated",
-                  error: `Failed to deactivate ${location.name}`
-                })}>
+                <DropdownMenuItem onClick={() => handleDeactivate(deactivateLink)}>
                   Deactivate
                 </DropdownMenuItem>
               )}

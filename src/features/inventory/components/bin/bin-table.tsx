@@ -96,7 +96,7 @@ export function BinTable({ zoneId, link, filter, onPageChange, onLifecycleEvent 
 
   return (
     <div className="space-y-3">
-      <div className="grid w-full gap-3 sm:grid-cols-2">
+      <div className="grid w-full gap-3 grid-cols-1 lg:grid-cols-2">
         {bins._embedded.binResponseList.map((bin: BinResponse) => {
           const activateLink = resolveLink(bin._links, "activate-bin");
           const deactivateLink = resolveLink(bin._links, "deactivate-bin");

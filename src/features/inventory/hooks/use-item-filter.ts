@@ -6,7 +6,7 @@ export type ItemFilterFormValue = ItemsFilterForm & Pageable;
 
 const DEFAULT_FILTER: ItemFilterFormValue = {
   page: 0,
-  size: 20,
+  size: 5,
 };
 
 export type ItemSearchCriteria = ItemsFilterForm & Pick<ItemFilterFormValue, "size">;

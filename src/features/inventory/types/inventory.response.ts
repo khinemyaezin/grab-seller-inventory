@@ -80,6 +80,17 @@ export interface InventoryItemResponse {
   _links: Record<string, HateoasLink>;
 }
 
+export interface InventoryExistenceItem {
+  sku: string;
+  exists: boolean;
+  inventoryItemId: string;
+}
+
+export interface CheckInventoryExistenceResponse {
+  items: InventoryExistenceItem[];
+  _links?: Record<string, HateoasLink>;
+}
+
 export interface StockMovementResponse {
   id: string;
   inventoryItemId: string;
@@ -123,4 +134,3 @@ export interface ActivateZoneResponse extends ZoneResponse{
 export interface DeactivateZoneResponse extends ZoneResponse{
 
 }
-

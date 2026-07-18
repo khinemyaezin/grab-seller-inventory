@@ -14,9 +14,8 @@ export function useProductSearch(filters?: SearchCatalogProductsRequest) {
   return useQuery<ProductVariantSearchResponse>({
     queryKey: ["products", "search", productSearchLink?.href, filters],
     queryFn: async () => catalogService.searchProducts(productSearchLink!, filters!),
-    enabled: !!productSearchLink,
+    enabled: !!productSearchLink && !!filters,
     placeholderData: (previousData) => previousData,
     staleTime: CATALOG_STALE_TIME,
   });
 }
-

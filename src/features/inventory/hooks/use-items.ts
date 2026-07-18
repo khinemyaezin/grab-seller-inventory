@@ -4,6 +4,8 @@ import { resolveUrlTemplate } from "@khinemyaezin/seller-api";
 import type { HateoasLink, Pageable } from "@khinemyaezin/seller-api";
 import type {
   AdjustStockRequest,
+  CheckInventoryExistenceRequest,
+  CheckInventoryExistenceResponse,
   CreateInventoryRequest,
   InventoryItemResponse,
   InventoryItemsResponse,
@@ -11,6 +13,7 @@ import type {
   ReceiveStockRequest,
   StockMovementsResponse,
 } from "@/features/inventory/types";
+import { useInventoryLink } from "./use-root";
 
 export function useItems(searchLink?: HateoasLink, filters?: ItemsFilterForm & Pageable) {
   return useQuery<InventoryItemsResponse>({
@@ -18,6 +21,21 @@ export function useItems(searchLink?: HateoasLink, filters?: ItemsFilterForm & P
     queryFn: () => itemService.searchItems(searchLink!, filters),
     enabled: !!searchLink,
     staleTime: 1000 * 60 * 5,
+  });
+}
+
+export function useInventoryExistence(locationId?: string, skus?: string[]) {
+  const checkExistenceLink = useInventoryLink("checkInventoryExistence");
+  const uniqueSkus = Array.from(new Set((skus ?? []).map((sku) => sku.trim()).filter(Boolean))).slice(0, 100);
+  const request: CheckInventoryExistenceRequest = {
+    locationId: locationId!,
+    skus: uniqueSkus,
+  };
+  return useQuery<CheckInventoryExistenceResponse>({
+    queryKey: ["inventory-items", "existence", locationId, uniqueSkus],
+    queryFn: () => itemService.checkExistence(checkExistenceLink!, request),
+    enabled: !!checkExistenceLink,
+    staleTime: 1000 * 60,
   });
 }
 

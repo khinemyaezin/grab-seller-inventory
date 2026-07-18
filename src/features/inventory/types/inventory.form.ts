@@ -22,9 +22,7 @@ export type LocationFormValues = {
 };
 
 export type LocationsFilterForm = {
-  query?: string;
-  active?: boolean;
-  type?: LocationType;
+  query?: string
 };
 
 export type ZoneFormValues = {
@@ -69,9 +67,7 @@ export type ItemFormValues = {
 };
 
 export type ItemsFilterForm = {
-  sku?: string;
-  locationId?: string;
-  status?: InventoryStatus;
+  sku?: string
 };
 
 export type CoverageFilterForm = {

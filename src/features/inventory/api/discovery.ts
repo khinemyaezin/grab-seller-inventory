@@ -13,6 +13,7 @@ export async function fetchInventoryRoot(link: HateoasLink): Promise<InventoryRo
     searchInventoryItems: resolveLink(response._links, "search-inventory-items"),
     createInventoryItem: resolveLink(response._links, "create-inventory-item"),
     inventoryItem: resolveLink(response._links, "inventory-item"),
+    checkInventoryExistence: resolveLink(response._links, "check-inventory-items-existence"),
     searchProductVariants: resolveLink(response._links, "search-product-variants"),
   };
 }

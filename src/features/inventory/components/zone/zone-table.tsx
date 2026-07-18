@@ -208,7 +208,7 @@ function ZoneAccordionItem({
         </DropdownMenu>
       </div>
       <AccordionContent className="!h-auto px-6 pb-6 [&_a]:no-underline">
-        <div className="space-y-4 px-12">
+        <div className="space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2 text-sm font-medium">
               <BoxesIcon className="size-4 text-muted-foreground" />

@@ -1,4 +1,4 @@
-import { api, type HateoasLink } from "@khinemyaezin/seller-api";
+import { api, toPageParams, type HateoasLink } from "@khinemyaezin/seller-api";
 import type {
   ProductVariantSearchResponse,
   SearchCatalogProductsRequest,
@@ -11,7 +11,7 @@ export const catalogService = {
       link,
       "POST",
       body,
-      { page: String(page), size: String(size) },
+      toPageParams({page,size}),
     );
   }
 };

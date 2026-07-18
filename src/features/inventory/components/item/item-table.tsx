@@ -31,6 +31,7 @@ export default function ItemTable({ filter, onPageChange }: ItemTableProps) {
     <Table>
       <TableHeader>
         <TableRow>
+          <TableHead className="w-12">#</TableHead>
           <TableHead>SKU</TableHead>
           <TableHead>Location</TableHead>
           <TableHead>On hand</TableHead>
@@ -41,7 +42,7 @@ export default function ItemTable({ filter, onPageChange }: ItemTableProps) {
       </TableHeader>
       <TableBody>
         {items.length > 0 ? (
-          items.map((item) => <ItemTableRow key={item.id} item={item} />)
+          items.map((item, index) => <ItemTableRow key={item.id} number={`${(data?.page ? data.page.number * data.page.size : 0) + index + 1}`} item={item} />)
         ) : (
           <TableRow>
             <TableCell colSpan={6} className="text-muted-foreground pointer-events-none text-center">
@@ -72,11 +73,12 @@ export default function ItemTable({ filter, onPageChange }: ItemTableProps) {
   );
 }
 
-function ItemTableRow({ item }: { item: InventoryItemResponse }) {
+function ItemTableRow({ item, number }: { item: InventoryItemResponse, number: string }) {
   const isLowStock = item.available <= item.reorderPoint;
 
   return (
     <TableRow>
+      <TableCell className="text-muted-foreground">{number}</TableCell>
       <TableCell className="grid grid-rows-2 gap-1">
         <span className="font-medium">
           {hasLink(item._links, "self") ? (

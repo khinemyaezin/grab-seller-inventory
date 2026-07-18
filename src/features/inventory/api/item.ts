@@ -1,7 +1,9 @@
-import { api } from "@khinemyaezin/seller-api";
+import { api, toPageParams } from "@khinemyaezin/seller-api";
 import type { HateoasLink, Pageable } from "@khinemyaezin/seller-api";
 import type {
   AdjustStockRequest,
+  CheckInventoryExistenceRequest,
+  CheckInventoryExistenceResponse,
   CreateInventoryRequest,
   InventoryItemResponse,
   InventoryItemsResponse,
@@ -9,14 +11,6 @@ import type {
   ReceiveStockRequest,
   StockMovementsResponse,
 } from "@/features/inventory/types";
-
-function toPageParams(pageable?: Pageable): Record<string, string> | undefined {
-  if (!pageable) return undefined;
-  return {
-    page: String(pageable.page),
-    size: String(pageable.size),
-  };
-}
 
 export const itemService = {
   createItem: (link: HateoasLink, request: CreateInventoryRequest, headers?: Record<string, string>) =>
@@ -34,6 +28,9 @@ export const itemService = {
       toPageParams({ page, size }),
     );
   },
+
+  checkExistence: (link: HateoasLink, request: CheckInventoryExistenceRequest, headers?: Record<string, string>) =>
+    api.followLink<CheckInventoryExistenceResponse>(link, "POST", request, undefined, headers),
 
   receiveStock: (link: HateoasLink, request: ReceiveStockRequest, headers?: Record<string, string>) =>
     api.followLink<InventoryItemResponse>(link, "POST", request, undefined, headers),

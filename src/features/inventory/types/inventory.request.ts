@@ -81,6 +81,11 @@ export interface SearchInventoryRequest {
   status?: string;
 }
 
+export interface CheckInventoryExistenceRequest {
+  locationId: string;
+  skus: string[];
+}
+
 export interface ReceiveStockRequest {
   quantity: number;
   type: ReceiveStockMovementType;
