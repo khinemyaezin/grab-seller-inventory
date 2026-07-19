@@ -39,7 +39,7 @@ export default function ItemDetailPage() {
   };
 
   return (
-    <div className="container mx-auto max-w-6xl p-6">
+    <div className="container mx-auto max-w-5xl p-6">
       <Header
         title="Stock item"
         description="View quantities, receive or adjust stock, and review movements."

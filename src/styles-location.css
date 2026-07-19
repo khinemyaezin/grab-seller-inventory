@@ -1,0 +1,3 @@
+/* Distinct entry so Module Federation attributes CSS to the LocationRoutes expose.
+   Sharing one styles.css import across multiple exposes drops css.sync from the manifest. */
+@import "./styles.css";

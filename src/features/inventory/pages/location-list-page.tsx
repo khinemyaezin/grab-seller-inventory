@@ -22,7 +22,7 @@ export default function LocationsPage() {
   };
 
   return (
-    <div className="container mx-auto max-w-5xl p-6">
+    <div className="container mx-auto max-w-3xl p-6">
       <Header
         title="Location"
         description="Manage your warehouses, stores, and distribution centers.">

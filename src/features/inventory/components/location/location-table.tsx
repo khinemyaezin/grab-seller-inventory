@@ -38,8 +38,7 @@ export default function LocationTable({ filter, onPageChange, onLifecycleEvent }
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-12">#</TableHead>
-          <TableHead>Code</TableHead>
+          <TableHead>Name</TableHead>
           <TableHead>Type</TableHead>
           <TableHead>Address</TableHead>
           <TableHead>Status</TableHead>
@@ -51,7 +50,6 @@ export default function LocationTable({ filter, onPageChange, onLifecycleEvent }
           <LocationTableRow
             key={location.id}
             location={location}
-            index={data?.page ? data.page.number * data.page.size + index + 1 : index + 1}
             onLifecycleEvent={onLifecycleEvent}
           />
         )) : (
@@ -65,7 +63,7 @@ export default function LocationTable({ filter, onPageChange, onLifecycleEvent }
       {showPagination && (
         <TableFooter className="bg-transparent">
           <TableRow>
-            <TableCell colSpan={6}>
+            <TableCell colSpan={5}>
               <div className="flex w-full items-center justify-between py-3">
                 <span className="text-muted-foreground grow">
                   Showing {data?.page ? data.page.number * data.page.size + 1 : 0} - {data?.page ? data.page.number * data.page.size + locations.length : 0} of {data?.page.totalElements} locations
@@ -88,11 +86,10 @@ export default function LocationTable({ filter, onPageChange, onLifecycleEvent }
 
 type LocationTableRowProps = {
   location: LocationResponse;
-  index: number;
   onLifecycleEvent?: (event: LocationLifecycleEvent) => void;
 };
 
-function LocationTableRow({ location, index, onLifecycleEvent }: LocationTableRowProps) {
+function LocationTableRow({ location, onLifecycleEvent }: LocationTableRowProps) {
   const activateLink = resolveLink(location._links, "activate-location");
   const deactivateLink = resolveLink(location._links, "deactivate-location");
   const deleteLink = resolveLink(location._links, "delete-location");
@@ -129,7 +126,6 @@ function LocationTableRow({ location, index, onLifecycleEvent }: LocationTableRo
 
   return (
     <TableRow>
-      <TableCell className="text-muted-foreground">{index}</TableCell>
       <TableCell className="grid grid-rows-2 gap-1">
         <span className="font-medium">
           {hasLink(location._links, "self") ? (
@@ -142,7 +138,7 @@ function LocationTableRow({ location, index, onLifecycleEvent }: LocationTableRo
             <span>{location.code}</span>
           )}
         </span>
-        <span className="font-normal text-muted-foreground">{location.name}</span>
+        <span className="text-xs text-muted-foreground">{location.name}</span>
       </TableCell>
       <TableCell>
         <Badge variant="secondary">{location.type}</Badge>

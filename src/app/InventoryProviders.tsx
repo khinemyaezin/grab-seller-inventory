@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 import { EntryLinkProvider, PlatformProvider } from "@khinemyaezin/seller-ui";
 import { HateoasLink } from "@khinemyaezin/seller-api";
 import { SellerPlatform } from "@khinemyaezin/seller-contracts";
-import "../styles.css";
 
 export default function InventoryProviders({
   link,

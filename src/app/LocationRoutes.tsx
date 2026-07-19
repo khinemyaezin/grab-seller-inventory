@@ -11,6 +11,7 @@ import EditZonePage from "@/features/inventory/pages/zone-edit-page";
 import NewBinPage from "@/features/inventory/pages/bins-new-page";
 import EditBinPage from "@/features/inventory/pages/bin-edit-page";
 import InventoryProviders from "./InventoryProviders";
+import "../styles-location.css";
 
 export default function LocationRoutes({
   link,

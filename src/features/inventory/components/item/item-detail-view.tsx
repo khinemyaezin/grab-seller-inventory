@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Badge } from "@khinemyaezin/seller-ui/components/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@khinemyaezin/seller-ui/components/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@khinemyaezin/seller-ui/components/accordion";
-import { PackagePlus, SlidersHorizontal } from "lucide-react";
+import { PackagePlus, SlidersHorizontal, ImageIcon, Package, CheckCircle2, Bookmark, AlertTriangle, RefreshCw, Copy } from "lucide-react";
 import { resolveLink } from "@khinemyaezin/seller-api";
 import { useItem } from "@/features/inventory/hooks/use-items";
 import { useInventoryLink } from "@/features/inventory/hooks/use-root";
@@ -42,41 +42,39 @@ export default function ItemDetailView({ itemId, onLifecycleEvent }: ItemDetailV
 
   return (
     <div className="grid gap-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex gap-3 items-center">
-            <span>{item.sku}</span>
-            <Badge variant={item.status === "ACTIVE" ? "success" : "secondary"}>
-              {item.status}
-            </Badge>
-          </CardTitle>
-          <CardDescription>{item.locationName}</CardDescription>
-
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-5">
-            <div className="space-y-3">
-              <dt className="text-muted-foreground">On hand</dt>
-              <dd className="text-lg font-semibold leading-none">{item.onHand}</dd>
+      <Card className="flex flex-col lg:flex-row items-start lg:items-center p-4 sm:p-6 gap-6 sm:gap-8">
+        <div className="flex w-full flex-col sm:flex-row shrink-0 items-start sm:items-center gap-4 sm:gap-6 border-b border-border/50 pb-6 lg:w-auto lg:border-b-0 lg:border-r lg:pb-0 lg:pr-8">
+          <div className="flex h-20 w-20 sm:h-28 sm:w-28 shrink-0 items-center justify-center rounded-xl p-2 bg-secondary">
+            <ImageIcon className="h-8 w-8 sm:h-10 sm:w-10 text-muted-foreground/30" />
+          </div>
+          <div className="space-y-3 sm:space-y-4">
+            <div className="space-y-1">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                <span className="text-lg sm:text-xl font-bold">{item.sku}</span>
+                <Badge variant={item.status === "ACTIVE" ? "success" : "secondary"} className="uppercase text-[10px] px-2 py-0.5">
+                  {item.status}
+                </Badge>
+              </div>
+              <div className="space-y-0.5 text-muted-foreground">
+                <div className="font-medium text-foreground">{item.productName || item.sku}</div>
+                <div className="text-sm">{item.locationName}</div>
+              </div>
             </div>
-            <div className="space-y-3">
-              <dt className="text-muted-foreground">Available</dt>
-              <dd className="text-lg font-semibold leading-none">{item.available}</dd>
-            </div>
-            <div className="space-y-3">
-              <dt className="text-muted-foreground">Reserved</dt>
-              <dd className="text-lg font-semibold leading-none">{item.reserved}</dd>
-            </div>
-            <div className="space-y-3">
-              <dt className="text-muted-foreground">Damaged</dt>
-              <dd className="text-lg font-semibold leading-none">{item.damaged}</dd>
-            </div>
-            <div className="space-y-3">
-              <dt className="text-muted-foreground">Reorder point</dt>
-              <dd className="text-lg font-semibold leading-none">{item.reorderPoint}</dd>
+            <div className="flex flex-wrap gap-2">
+              <Badge variant="secondary" className="flex items-center gap-1.5 bg-secondary/50 px-2.5 py-1 font-mono text-xs text-muted-foreground">
+                {item.sku}
+              </Badge>
             </div>
           </div>
-        </CardContent>
+        </div>
+
+        <div className="grid w-full grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 md:grid-cols-5 lg:flex-1">
+          <StatBlock label="On Hand" value={item.onHand} />
+          <StatBlock label="Available" value={item.available} />
+          <StatBlock label="Reserved" value={item.reserved} />
+          <StatBlock label="Damaged" value={item.damaged} />
+          <StatBlock label="Reorder Point" value={item.reorderPoint} />
+        </div>
       </Card>
 
 
@@ -133,6 +131,18 @@ export default function ItemDetailView({ itemId, onLifecycleEvent }: ItemDetailV
             </CardContent>
           </Card>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function StatBlock({ label, value }: { label: string, value: number }) {
+  return (
+    <div className="flex flex-col items-center justify-center space-y-3">
+      <div className="flex flex-col items-center space-y-1">
+        <span className="text-xs font-medium text-muted-foreground">{label}</span>
+        <span className="text-2xl font-bold tracking-tight">{value}</span>
+        <span className="text-xs text-muted-foreground">units</span>
       </div>
     </div>
   );
