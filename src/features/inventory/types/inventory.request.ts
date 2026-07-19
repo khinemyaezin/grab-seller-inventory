@@ -96,3 +96,43 @@ export interface AdjustStockRequest {
   newOnHandQuantity: number;
   reason: AdjustmentReason;
 }
+
+export interface MarkDamagedRequest {
+  quantity: number;
+  notes?: string;
+}
+
+export interface WriteOffStockRequest {
+  quantity: number;
+  reason: string;
+  notes?: string;
+}
+
+export interface ReturnToVendorRequest {
+  quantity: number;
+  reason: string;
+  notes?: string;
+}
+
+export interface TransferInventoryRequest {
+  toLocationId: string;
+  quantity: number;
+  notes?: string;
+}
+
+export interface AnnounceInTransitRequest {
+  quantity: number;
+  referenceId?: string;
+}
+
+export interface ReceiveInTransitRequest {
+  quantity: number;
+  referenceId?: string;
+}
+
+export interface UpdateReorderConfigRequest {
+  safetyStock: number;
+  reorderPoint: number;
+  reorderQuantity: number;
+  maxStock?: number | null;
+}

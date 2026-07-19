@@ -86,3 +86,43 @@ export type AdjustStockFormValues = {
   newOnHandQuantity: number;
   reason: AdjustmentReason;
 };
+
+export type MarkDamagedFormValues = {
+  quantity: number;
+  notes: string;
+};
+
+export type WriteOffStockFormValues = {
+  quantity: number;
+  reason: string;
+  notes: string;
+};
+
+export type ReturnToVendorFormValues = {
+  quantity: number;
+  reason: string;
+  notes: string;
+};
+
+export type TransferInventoryFormValues = {
+  toLocationId: string;
+  quantity: number;
+  notes: string;
+};
+
+export type AnnounceInTransitFormValues = {
+  quantity: number;
+  referenceId: string;
+};
+
+export type ReceiveInTransitFormValues = {
+  quantity: number;
+  referenceId: string;
+};
+
+export type UpdateReorderConfigFormValues = {
+  safetyStock: number;
+  reorderPoint: number;
+  reorderQuantity: number;
+  maxStock: number | null;
+};
