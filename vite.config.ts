@@ -19,13 +19,17 @@ export default defineConfig(({ mode }) => {
         filename: "remoteEntry.js",
         manifest: true,
         dts: { generateTypes: { tsConfigPath: "./tsconfig.app.json", abortOnError: true } },
-        exposes: { "./Routes": "./src/app/AppRoutes.tsx" },
+        exposes: {
+          "./LocationRoutes": "./src/app/LocationRoutes.tsx",
+          "./StockRoutes": "./src/app/StockRoutes.tsx",
+        },
         shared: {
           react: { singleton: true, requiredVersion: "19.2.4" },
           "react-dom": { singleton: true, requiredVersion: "19.2.4" },
           "react-router": { singleton: true, requiredVersion: "7.18.0" },
           "@tanstack/react-query": { singleton: true, requiredVersion: "5.99.2" },
-          "@khinemyaezin/seller-api": { singleton: true },
+          "@khinemyaezin/seller-api": { singleton: true, requiredVersion: "^1.0.1-canary-16cfab0" },
+          "@khinemyaezin/seller-ui": { singleton: true, requiredVersion: "^1.0.1-canary-16cfab0" }
         },
       }),
     ],

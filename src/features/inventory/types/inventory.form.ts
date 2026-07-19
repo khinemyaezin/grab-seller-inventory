@@ -1,4 +1,11 @@
-import type { LocationType, ZoneType } from "./inventory.model";
+import type {
+  AdjustmentReason,
+  CoverageGapKind,
+  InventoryStatus,
+  LocationType,
+  ReceiveStockMovementType,
+  ZoneType,
+} from "./inventory.model";
 
 export type LocationFormValues = {
   code: string;
@@ -15,34 +22,67 @@ export type LocationFormValues = {
 };
 
 export type LocationsFilterForm = {
-  query?: string;
-  active?: boolean;
-  type?: LocationType;
+  query?: string
 };
 
 export type ZoneFormValues = {
-    code: string;
-    name: string;
-    type: ZoneType;
-    active?: boolean;
+  code: string;
+  name: string;
+  type: ZoneType;
+  active?: boolean;
 }
 
 export type ZonesFilterForm = {
-    locationId?: string;
-    query?: string;
-    active?: boolean;
-    type?: ZoneType;
+  locationId?: string;
+  query?: string;
+  active?: boolean;
+  type?: ZoneType;
 };
 
 export type BinFormValues = {
-    code: string;
-    name: string;
-    maxCapacity: number;
-    active?: boolean;
+  code: string;
+  name: string;
+  maxCapacity: number;
+  active?: boolean;
 }
 
 export type BinsFilterForm = {
-    zoneId?: string;
-    query?: string;
-    active?: boolean;
+  zoneId?: string;
+  query?: string;
+  active?: boolean;
+};
+
+export type ItemFormValues = {
+  product: {
+    sku:string,
+    productName:string
+  };
+  productVariantId: string;
+  locationId: string;
+  initialQuantity: number;
+  safetyStock: number;
+  reorderPoint: number;
+  reorderQuantity: number;
+  maxStock: number | "";
+};
+
+export type ItemsFilterForm = {
+  sku?: string
+};
+
+export type CoverageFilterForm = {
+  locationId?: string;
+  productId?: string;
+  gap?: CoverageGapKind | "ALL";
+};
+
+export type ReceiveStockFormValues = {
+  quantity: number;
+  type: ReceiveStockMovementType;
+  referenceId: string;
+};
+
+export type AdjustStockFormValues = {
+  newOnHandQuantity: number;
+  reason: AdjustmentReason;
 };

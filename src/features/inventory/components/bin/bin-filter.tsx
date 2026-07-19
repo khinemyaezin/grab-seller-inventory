@@ -10,29 +10,10 @@ const FIELDS: FilterField[] = [
   {
     type: "input",
     name: "query",
-    label: "Search",
+    label: "",
     placeholder: "Search bins",
     debounceMs: 300,
-  },
-  {
-    type: "select",
-    name: "active",
-    label: "Status",
-    placeholder: "Status",
-    groupLabel: "Bin Status",
-    options: [
-      { label: "All", value: ALL },
-      { label: "Active", value: "true" },
-      { label: "Inactive", value: "false" },
-    ],
-  },
-  {
-    type: "select",
-    name: "size",
-    label: "Rows",
-    placeholder: "Page size",
-    options: PAGE_SIZES.map((size) => ({ label: String(size), value: String(size) })),
-  },
+  }
 ];
 
 const DEFAULT_VALUES: FilterValues = {

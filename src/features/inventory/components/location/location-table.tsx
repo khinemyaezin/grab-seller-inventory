@@ -38,7 +38,7 @@ export default function LocationTable({ filter, onPageChange, onLifecycleEvent }
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Code</TableHead>
+          <TableHead>Name</TableHead>
           <TableHead>Type</TableHead>
           <TableHead>Address</TableHead>
           <TableHead>Status</TableHead>
@@ -46,7 +46,7 @@ export default function LocationTable({ filter, onPageChange, onLifecycleEvent }
         </TableRow>
       </TableHeader>
       <TableBody>
-        {locations.length > 0 ? locations.map((location) => (
+        {locations.length > 0 ? locations.map((location, index) => (
           <LocationTableRow
             key={location.id}
             location={location}
@@ -63,7 +63,7 @@ export default function LocationTable({ filter, onPageChange, onLifecycleEvent }
       {showPagination && (
         <TableFooter className="bg-transparent">
           <TableRow>
-            <TableCell colSpan={6}>
+            <TableCell colSpan={5}>
               <div className="flex w-full items-center justify-between py-3">
                 <span className="text-muted-foreground grow">
                   Showing {data?.page ? data.page.number * data.page.size + 1 : 0} - {data?.page ? data.page.number * data.page.size + locations.length : 0} of {data?.page.totalElements} locations
@@ -85,9 +85,8 @@ export default function LocationTable({ filter, onPageChange, onLifecycleEvent }
 }
 
 type LocationTableRowProps = {
-  location: LocationResponse,
+  location: LocationResponse;
   onLifecycleEvent?: (event: LocationLifecycleEvent) => void;
-
 };
 
 function LocationTableRow({ location, onLifecycleEvent }: LocationTableRowProps) {
@@ -98,7 +97,7 @@ function LocationTableRow({ location, onLifecycleEvent }: LocationTableRowProps)
   const deactivateMutation = useDeactivateLocationMutation();
   const deleteMutation = useDeleteLocationMutation();
 
-  const handleActivate = async (link: HateoasLink, messages: { success: string; error: string }) => {
+  const handleActivate = async (link: HateoasLink) => {
     try {
       await activateMutation.mutateAsync(link);
       onLifecycleEvent?.({ type: "activated" });
@@ -107,7 +106,7 @@ function LocationTableRow({ location, onLifecycleEvent }: LocationTableRowProps)
     }
   };
 
-  const handleDeactivate = async (link: HateoasLink, messages: { success: string; error: string }) => {
+  const handleDeactivate = async (link: HateoasLink) => {
     try {
       await deactivateMutation.mutateAsync(link);
       onLifecycleEvent?.({ type: "deactivated" });
@@ -139,7 +138,7 @@ function LocationTableRow({ location, onLifecycleEvent }: LocationTableRowProps)
             <span>{location.code}</span>
           )}
         </span>
-        <span className="font-normal text-muted-foreground">{location.name}</span>
+        <span className="text-xs text-muted-foreground">{location.name}</span>
       </TableCell>
       <TableCell>
         <Badge variant="secondary">{location.type}</Badge>
@@ -167,18 +166,12 @@ function LocationTableRow({ location, onLifecycleEvent }: LocationTableRowProps)
                 </DropdownMenuItem>
               )}
               {activateLink && (
-                <DropdownMenuItem onClick={() => handleActivate(activateLink, {
-                  success: "Successfully activated",
-                  error: `Failed to activate ${location.name}`
-                })}>
+                <DropdownMenuItem onClick={() => handleActivate(activateLink)}>
                   Activate
                 </DropdownMenuItem>
               )}
               {deactivateLink && (
-                <DropdownMenuItem onClick={() => handleDeactivate(deactivateLink, {
-                  success: "Successfully deactivated",
-                  error: `Failed to deactivate ${location.name}`
-                })}>
+                <DropdownMenuItem onClick={() => handleDeactivate(deactivateLink)}>
                   Deactivate
                 </DropdownMenuItem>
               )}

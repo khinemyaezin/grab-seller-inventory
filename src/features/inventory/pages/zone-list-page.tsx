@@ -42,7 +42,7 @@ export default function ZonesPage() {
   };
 
   return (
-    <div className="container mx-auto max-w-5xl p-6 space-y-6">
+    <div className="container mx-auto max-w-4xl p-6 space-y-6">
       <Header
         title="Zones"
         description="Manage zones and bins for this location."

@@ -1,5 +1,9 @@
-import type { LocationType, ZoneType } from "./inventory.model";
-import type { ZoneResponse } from "./inventory.response";
+import type {
+  AdjustmentReason,
+  LocationType,
+  ReceiveStockMovementType,
+  ZoneType,
+} from "./inventory.model";
 
 export interface CreateLocationRequest {
   code: string;
@@ -57,11 +61,38 @@ export interface UpdateBinRequest {
   active?: boolean;
 }
 
-export interface ActivateZoneResponse extends ZoneResponse{
 
+
+
+export interface CreateInventoryRequest {
+  sku: string;
+  productVariantId?: string;
+  locationId: string;
+  initialQuantity: number;
+  safetyStock?: number;
+  reorderPoint?: number;
+  reorderQuantity?: number;
+  maxStock?: number;
 }
 
+export interface SearchInventoryRequest {
+  sku?: string;
+  locationId?: string;
+  status?: string;
+}
 
-export interface DeactivateZoneResponse extends ZoneResponse{
+export interface CheckInventoryExistenceRequest {
+  locationId: string;
+  skus: string[];
+}
 
+export interface ReceiveStockRequest {
+  quantity: number;
+  type: ReceiveStockMovementType;
+  referenceId?: string;
+}
+
+export interface AdjustStockRequest {
+  newOnHandQuantity: number;
+  reason: AdjustmentReason;
 }
