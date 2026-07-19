@@ -91,6 +91,7 @@ export default function ItemTable({ filter, onPageChange }: ItemTableProps) {
           <TableHead>Item</TableHead>
           <TableHead>On Hand</TableHead>
           <TableHead>Available</TableHead>
+          <TableHead>In Transit</TableHead>
           <TableHead>Reserved</TableHead>
           <TableHead>Reorder Point</TableHead>
         </TableRow>
@@ -158,6 +159,7 @@ function ItemTableRow({ item }: { item: InventoryItemResponse }) {
       </TableCell>
       <UnitsCell value={item.onHand} />
       <UnitsCell value={item.available} className={health.accentClass} />
+      <UnitsCell value={item.inTransit ?? 0} />
       <UnitsCell value={item.reserved} />
       <UnitsCell value={item.reorderPoint} />
     </TableRow>

@@ -8,6 +8,7 @@ import { useItemFilter } from "@/features/inventory/hooks/use-item-filter";
 
 export default function ItemsView() {
   const createItemLink = useInventoryLink("createInventoryItem");
+  const reorderLink = useInventoryLink("reorderSuggestions");
   const { filter, updateCriteria, updatePage } = useItemFilter();
 
   return (
@@ -18,6 +19,11 @@ export default function ItemsView() {
             <ItemsFilter onChange={updateCriteria} />
           </div>
           <div className="flex gap-2 self-start sm:self-end">
+            {reorderLink && (
+              <Button variant="outline" asChild>
+                <Link to="reorder">Reorder suggestions</Link>
+              </Button>
+            )}
             {createItemLink && (
               <Button variant="outline" asChild>
                 <Link to="new">Add stock item</Link>

@@ -10,8 +10,18 @@ import type {
   InventoryItemResponse,
   InventoryItemsResponse,
   ItemsFilterForm,
+  MarkDamagedRequest,
   ReceiveStockRequest,
+  ReturnToVendorRequest,
   StockMovementsResponse,
+  TransferInventoryRequest,
+  TransferInventoryResponse,
+  WriteOffStockRequest,
+  InventoryReservationsResponse,
+  AnnounceInTransitRequest,
+  ReceiveInTransitRequest,
+  UpdateReorderConfigRequest,
+  ReorderSuggestionsResponse,
 } from "@/features/inventory/types";
 import { useInventoryLink } from "./use-root";
 
@@ -60,6 +70,15 @@ export function useItemMovements(link?: HateoasLink, pageable?: Pageable) {
   });
 }
 
+export function useItemReservations(link?: HateoasLink, pageable?: Pageable) {
+  return useQuery<InventoryReservationsResponse>({
+    queryKey: ["inventory-item-reservations", link?.href, pageable],
+    queryFn: () => itemService.getReservations(link!, pageable),
+    enabled: !!link,
+    staleTime: 1000 * 60,
+  });
+}
+
 export function useCreateItemMutation() {
   const queryClient = useQueryClient();
   return useMutation<InventoryItemResponse, Error, { link: HateoasLink; request: CreateInventoryRequest }>({
@@ -92,5 +111,108 @@ export function useAdjustStockMutation() {
       queryClient.invalidateQueries({ queryKey: ["inventory-item", data.id] });
       queryClient.invalidateQueries({ queryKey: ["inventory-item-movements"] });
     },
+  });
+}
+
+function invalidateItemQueries(queryClient: ReturnType<typeof useQueryClient>, itemId?: string) {
+  queryClient.invalidateQueries({ queryKey: ["inventory-items"] });
+  if (itemId) {
+    queryClient.invalidateQueries({ queryKey: ["inventory-item", itemId] });
+  }
+  queryClient.invalidateQueries({ queryKey: ["inventory-item-movements"] });
+}
+
+export function useMarkDamagedMutation() {
+  const queryClient = useQueryClient();
+  return useMutation<InventoryItemResponse, Error, { link: HateoasLink; request: MarkDamagedRequest }>({
+    mutationFn: ({ link, request }) => itemService.markDamaged(link, request),
+    onSuccess: (data) => invalidateItemQueries(queryClient, data.id),
+  });
+}
+
+export function useWriteOffMutation() {
+  const queryClient = useQueryClient();
+  return useMutation<InventoryItemResponse, Error, { link: HateoasLink; request: WriteOffStockRequest }>({
+    mutationFn: ({ link, request }) => itemService.writeOff(link, request),
+    onSuccess: (data) => invalidateItemQueries(queryClient, data.id),
+  });
+}
+
+export function useReturnToVendorMutation() {
+  const queryClient = useQueryClient();
+  return useMutation<InventoryItemResponse, Error, { link: HateoasLink; request: ReturnToVendorRequest }>({
+    mutationFn: ({ link, request }) => itemService.returnToVendor(link, request),
+    onSuccess: (data) => invalidateItemQueries(queryClient, data.id),
+  });
+}
+
+export function useSuspendInventoryMutation() {
+  const queryClient = useQueryClient();
+  return useMutation<InventoryItemResponse, Error, { link: HateoasLink }>({
+    mutationFn: ({ link }) => itemService.suspend(link),
+    onSuccess: (data) => invalidateItemQueries(queryClient, data.id),
+  });
+}
+
+export function useActivateInventoryMutation() {
+  const queryClient = useQueryClient();
+  return useMutation<InventoryItemResponse, Error, { link: HateoasLink }>({
+    mutationFn: ({ link }) => itemService.activate(link),
+    onSuccess: (data) => invalidateItemQueries(queryClient, data.id),
+  });
+}
+
+export function useDiscontinueInventoryMutation() {
+  const queryClient = useQueryClient();
+  return useMutation<InventoryItemResponse, Error, { link: HateoasLink }>({
+    mutationFn: ({ link }) => itemService.discontinue(link),
+    onSuccess: (data) => invalidateItemQueries(queryClient, data.id),
+  });
+}
+
+export function useTransferInventoryMutation() {
+  const queryClient = useQueryClient();
+  return useMutation<TransferInventoryResponse, Error, { link: HateoasLink; request: TransferInventoryRequest }>({
+    mutationFn: ({ link, request }) => itemService.transfer(link, request),
+    onSuccess: (data) => {
+      invalidateItemQueries(queryClient, data.source.id);
+      invalidateItemQueries(queryClient, data.destination.id);
+    },
+  });
+}
+
+export function useAnnounceInTransitMutation() {
+  const queryClient = useQueryClient();
+  return useMutation<InventoryItemResponse, Error, { link: HateoasLink; request: AnnounceInTransitRequest }>({
+    mutationFn: ({ link, request }) => itemService.announceInTransit(link, request),
+    onSuccess: (data) => invalidateItemQueries(queryClient, data.id),
+  });
+}
+
+export function useReceiveInTransitMutation() {
+  const queryClient = useQueryClient();
+  return useMutation<InventoryItemResponse, Error, { link: HateoasLink; request: ReceiveInTransitRequest }>({
+    mutationFn: ({ link, request }) => itemService.receiveInTransit(link, request),
+    onSuccess: (data) => invalidateItemQueries(queryClient, data.id),
+  });
+}
+
+export function useUpdateReorderConfigMutation() {
+  const queryClient = useQueryClient();
+  return useMutation<InventoryItemResponse, Error, { link: HateoasLink; request: UpdateReorderConfigRequest }>({
+    mutationFn: ({ link, request }) => itemService.updateReorderConfig(link, request),
+    onSuccess: (data) => {
+      invalidateItemQueries(queryClient, data.id);
+      queryClient.invalidateQueries({ queryKey: ["reorder-suggestions"] });
+    },
+  });
+}
+
+export function useReorderSuggestions(link?: HateoasLink, params?: { locationId?: string; sku?: string }) {
+  return useQuery<ReorderSuggestionsResponse>({
+    queryKey: ["reorder-suggestions", link?.href, params],
+    queryFn: () => itemService.getReorderSuggestions(link!, params),
+    enabled: !!link,
+    staleTime: 1000 * 60,
   });
 }

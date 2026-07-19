@@ -7,52 +7,55 @@ import {
   TableHeader,
   TableRow,
 } from "@khinemyaezin/seller-ui/components/table";
+import { Badge } from "@khinemyaezin/seller-ui/components/badge";
 import { Pager } from "@khinemyaezin/seller-ui/components/pager";
 import type { HateoasLink } from "@khinemyaezin/seller-api";
-import { useItemMovements } from "@/features/inventory/hooks/use-items";
+import { useItemReservations } from "@/features/inventory/hooks/use-items";
 import { useState } from "react";
 
-export type ItemMovementsTableProps = {
+export type ItemReservationsTableProps = {
   link: HateoasLink;
 };
 
-export default function ItemMovementsTable({ link }: ItemMovementsTableProps) {
+export default function ItemReservationsTable({ link }: ItemReservationsTableProps) {
   const [page, setPage] = useState(0);
-  const { data } = useItemMovements(link, { page, size: 5 });
-  const movements = data?._embedded?.stockMovementResponseList ?? [];
+  const { data } = useItemReservations(link, { page, size: 10 });
+  const reservations = data?._embedded?.inventoryReservationResponseList ?? [];
   const showPagination = (data?.page.totalPages ?? 0) > 1;
 
   return (
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Type</TableHead>
+          <TableHead>Order</TableHead>
           <TableHead>Qty</TableHead>
-          <TableHead>On hand</TableHead>
-          <TableHead>Reference</TableHead>
+          <TableHead>Status</TableHead>
+          <TableHead>Expires</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        {movements.length > 0 ? (
-          movements.map((movement) => (
-            <TableRow key={movement.id}>
-              <TableCell  className="grid grid-rows-2 gap-1">
-                <span>{formatLabel(movement.type)}</span>
-                <span className="text-muted-foreground"> {formatDate(movement.createdAt)}</span>
+        {reservations.length > 0 ? (
+          reservations.map((reservation) => (
+            <TableRow key={reservation.id}>
+              <TableCell className="grid grid-rows-2 gap-1">
+                <span className="font-mono text-xs">{reservation.orderId}</span>
+                <span className="text-muted-foreground text-xs">{reservation.orderLineId}</span>
               </TableCell>
-              <TableCell>{movement.quantity}</TableCell>
+              <TableCell>{reservation.quantity}</TableCell>
               <TableCell>
-                {movement.onHandBefore} → {movement.onHandAfter}
+                <Badge variant={reservation.status === "ACTIVE" ? "success" : "secondary"}>
+                  {reservation.status}
+                </Badge>
               </TableCell>
               <TableCell className="text-muted-foreground">
-                {movement.referenceId ?? "—"}
+                {reservation.expiresAt ? formatDate(reservation.expiresAt) : "—"}
               </TableCell>
             </TableRow>
           ))
         ) : (
           <TableRow>
-            <TableCell colSpan={5} className="text-muted-foreground text-center">
-              No movements yet.
+            <TableCell colSpan={4} className="text-muted-foreground text-center">
+              No reservations yet.
             </TableCell>
           </TableRow>
         )}
@@ -60,7 +63,7 @@ export default function ItemMovementsTable({ link }: ItemMovementsTableProps) {
       {showPagination && data?.page && (
         <TableFooter className="bg-transparent">
           <TableRow>
-            <TableCell colSpan={5}>
+            <TableCell colSpan={4}>
               <div className="flex justify-end py-3">
                 <Pager className="justify-end" onPageChange={setPage} {...data.page} />
               </div>
@@ -78,11 +81,4 @@ function formatDate(value: string) {
   } catch {
     return value;
   }
-}
-
-function formatLabel(value: string) {
-  return value
-    .split("_")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(" ");
 }

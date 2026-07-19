@@ -6,6 +6,7 @@ import ItemListPage from "@/features/inventory/pages/item-list-page";
 import ItemNewPage from "@/features/inventory/pages/item-new-page";
 import ItemDetailPage from "@/features/inventory/pages/item-detail-page";
 import CoveragePage from "@/features/inventory/pages/coverage-page";
+import ReorderSuggestionsPage from "@/features/inventory/pages/reorder-suggestions-page";
 import { CatalogEntryLinkProvider } from "@/features/inventory/context/catalog-entry-link";
 import InventoryProviders from "./InventoryProviders";
 import "../styles-stock.css";
@@ -26,6 +27,7 @@ export default function StockRoutes({
           <Route index element={<ItemListPage />} />
           <Route path="new" element={<ItemNewPage />} />
           <Route path="coverage" element={<CoveragePage />} />
+          <Route path="reorder" element={<ReorderSuggestionsPage />} />
           <Route path=":itemId" element={<ItemDetailPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>

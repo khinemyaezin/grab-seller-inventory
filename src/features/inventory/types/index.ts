@@ -49,6 +49,13 @@ export type {
   CheckInventoryExistenceRequest,
   ReceiveStockRequest,
   AdjustStockRequest,
+  MarkDamagedRequest,
+  WriteOffStockRequest,
+  ReturnToVendorRequest,
+  TransferInventoryRequest,
+  AnnounceInTransitRequest,
+  ReceiveInTransitRequest,
+  UpdateReorderConfigRequest,
 } from "./inventory.request";
 
 // Response DTOs
@@ -65,6 +72,11 @@ export type {
   LocationResponse,
   InventoryItemResponse,
   StockMovementResponse,
+  InventoryReservationResponse,
+  InventoryReservationsResponse,
+  TransferInventoryResponse,
+  ReorderSuggestionsResponse,
+  ReorderSuggestionResponse,
   ActivateZoneResponse,
   DeactivateZoneResponse,
 } from "./inventory.response";
@@ -82,4 +94,11 @@ export type {
   CoverageFilterForm,
   ReceiveStockFormValues,
   AdjustStockFormValues,
+  MarkDamagedFormValues,
+  WriteOffStockFormValues,
+  ReturnToVendorFormValues,
+  TransferInventoryFormValues,
+  AnnounceInTransitFormValues,
+  ReceiveInTransitFormValues,
+  UpdateReorderConfigFormValues,
 } from "./inventory.form";
