@@ -73,7 +73,6 @@ export default function ItemTable({ filter, onPageChange }: ItemTableProps) {
 }
 
 function ItemTableRow({ item }: { item: InventoryItemResponse }) {
-  const title = item.productName?.trim() || item.sku;
 
   return (
     <TableRow>
@@ -86,10 +85,10 @@ function ItemTableRow({ item }: { item: InventoryItemResponse }) {
             <div className="font-medium leading-tight">
               {hasLink(item._links, "self") ? (
                 <Link to={item.id} className="hover:underline">
-                  {title}
+                  {item.productName}
                 </Link>
               ) : (
-                <span>{title}</span>
+                <span>{item.productName}</span>
               )}
             </div>
             <div className="text-xs text-muted-foreground space-y-1">
