@@ -43,7 +43,7 @@ export default function NewBinPage() {
   };
 
   return (
-    <div className="container mx-auto max-w-2xl p-6">
+    <div className="container mx-auto max-w-3xl p-6">
       <Header
         title="New Bin"
         description="Create a new bin in this zone."

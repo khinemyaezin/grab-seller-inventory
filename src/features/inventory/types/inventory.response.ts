@@ -146,6 +146,7 @@ export interface ReorderSuggestionResponse {
   inventoryItemId: string;
   sku: string;
   productVariantId: string | null;
+  productName: string,
   locationId: string;
   currentAvailable: number;
   reorderPoint: number;
@@ -180,4 +181,44 @@ export interface ActivateZoneResponse extends ZoneResponse{
 
 export interface DeactivateZoneResponse extends ZoneResponse{
 
+}
+
+export interface InventoryCountPercent {
+  count: number;
+  percent: number;
+}
+
+export interface InventoryStatusBreakdown {
+  active: InventoryCountPercent;
+  outOfStock: InventoryCountPercent;
+  suspended: InventoryCountPercent;
+  discontinued: InventoryCountPercent;
+}
+
+export interface InventoryHealthBreakdown {
+  eligibleItems: number;
+  inStock: InventoryCountPercent;
+  lowStock: InventoryCountPercent;
+  outOfStock: InventoryCountPercent;
+  critical: InventoryCountPercent;
+}
+
+export interface InventoryQuantityTotals {
+  onHand: number;
+  reserved: number;
+  inTransit: number;
+  damaged: number;
+  available: number;
+}
+
+export interface InventorySummaryResponse {
+  merchantId: string;
+  locationId: string | null;
+  locationCode: string | null;
+  locationName: string | null;
+  totalItems: number;
+  status: InventoryStatusBreakdown;
+  health: InventoryHealthBreakdown;
+  quantities: InventoryQuantityTotals;
+  _links?: Record<string, HateoasLink>;
 }

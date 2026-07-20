@@ -22,6 +22,7 @@ import type {
   ReceiveInTransitRequest,
   UpdateReorderConfigRequest,
   ReorderSuggestionsResponse,
+  InventorySummaryResponse,
 } from "@/features/inventory/types";
 import { useInventoryLink } from "./use-root";
 
@@ -212,6 +213,15 @@ export function useReorderSuggestions(link?: HateoasLink, params?: { locationId?
   return useQuery<ReorderSuggestionsResponse>({
     queryKey: ["reorder-suggestions", link?.href, params],
     queryFn: () => itemService.getReorderSuggestions(link!, params),
+    enabled: !!link,
+    staleTime: 1000 * 60,
+  });
+}
+
+export function useInventorySummary(link?: HateoasLink, locationId?: string) {
+  return useQuery<InventorySummaryResponse>({
+    queryKey: ["inventory-summary", link?.href, locationId ?? null],
+    queryFn: () => itemService.getSummary(link!, locationId),
     enabled: !!link,
     staleTime: 1000 * 60,
   });

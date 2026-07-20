@@ -45,7 +45,7 @@ export default function EditZonePage() {
     };
 
     return (
-        <div className="container mx-auto max-w-2xl p-6">
+        <div className="container mx-auto max-w-3xl p-6">
             <Header
                 title={`Edit Zone`}
                 description="Update zone."
