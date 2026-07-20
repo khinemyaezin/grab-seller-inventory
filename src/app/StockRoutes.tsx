@@ -7,6 +7,7 @@ import ItemNewPage from "@/features/inventory/pages/item-new-page";
 import ItemDetailPage from "@/features/inventory/pages/item-detail-page";
 import CoveragePage from "@/features/inventory/pages/coverage-page";
 import ReorderSuggestionsPage from "@/features/inventory/pages/reorder-suggestions-page";
+
 import { CatalogEntryLinkProvider } from "@/features/inventory/context/catalog-entry-link";
 import InventoryProviders from "./InventoryProviders";
 import "../styles-stock.css";

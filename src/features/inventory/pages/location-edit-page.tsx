@@ -19,7 +19,7 @@ export default function EditLocationPage() {
 
   const toast = (type: "success" | "error", message: string) =>
     platform?.events.publish("shell:toast:v1", { type, message, position: "top-center" });
-  
+
   const handleEvent = (event: LocationLifecycleEvent) => {
     switch (event.type) {
       case "titleResolved": setTitle(event.title); break;
@@ -33,7 +33,7 @@ export default function EditLocationPage() {
   };
 
   return (
-    <div className="container mx-auto max-w-2xl p-6">
+    <div className="container mx-auto max-w-3xl p-6">
       <Header
         title={`Edit Location`}
         description="Update location details and manage zones."

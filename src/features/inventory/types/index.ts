@@ -79,6 +79,11 @@ export type {
   ReorderSuggestionResponse,
   ActivateZoneResponse,
   DeactivateZoneResponse,
+  InventoryCountPercent,
+  InventoryStatusBreakdown,
+  InventoryHealthBreakdown,
+  InventoryQuantityTotals,
+  InventorySummaryResponse,
 } from "./inventory.response";
 
 // Form Values

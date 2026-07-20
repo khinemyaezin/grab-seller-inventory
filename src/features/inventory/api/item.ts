@@ -20,6 +20,7 @@ import type {
   ReceiveInTransitRequest,
   UpdateReorderConfigRequest,
   ReorderSuggestionsResponse,
+  InventorySummaryResponse,
 } from "@/features/inventory/types";
 
 export const itemService = {
@@ -86,4 +87,9 @@ export const itemService = {
 
   getReorderSuggestions: (link: HateoasLink, params?: { locationId?: string; sku?: string }, headers?: Record<string, string>) =>
     api.followLink<ReorderSuggestionsResponse>(link, "GET", undefined, params, headers),
+
+  getSummary: (link: HateoasLink, locationId?: string, headers?: Record<string, string>) => {
+    const params = locationId ? { locationId } : undefined;
+    return api.followLink<InventorySummaryResponse>(link, "GET", undefined, params, headers);
+  },
 };

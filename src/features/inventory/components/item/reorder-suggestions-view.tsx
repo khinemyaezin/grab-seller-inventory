@@ -1,4 +1,4 @@
-import { Card, CardContent } from "@khinemyaezin/seller-ui/components/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@khinemyaezin/seller-ui/components/card";
 import {
   Table,
   TableBody,
@@ -12,6 +12,8 @@ import { Link } from "react-router";
 import { useInventoryLink } from "@/features/inventory/hooks/use-root";
 import { useReorderSuggestions } from "@/features/inventory/hooks/use-items";
 import type { ReorderSuggestionResponse, ReorderSuggestionsResponse } from "@/features/inventory/types";
+import { ImageIcon } from "lucide-react";
+import { routes } from "@khinemyaezin/seller-contracts";
 
 function extractSuggestions(data?: ReorderSuggestionsResponse): ReorderSuggestionResponse[] {
   const embedded = data?._embedded;
@@ -24,9 +26,9 @@ function extractSuggestions(data?: ReorderSuggestionsResponse): ReorderSuggestio
   return Object.values(embedded).flatMap((value) => (Array.isArray(value) ? value : []));
 }
 
-export default function ReorderSuggestionsView() {
+export default function ReorderSuggestionsView({ locationId }: { locationId?: string }) {
   const link = useInventoryLink("reorderSuggestions");
-  const { data, isLoading } = useReorderSuggestions(link);
+  const { data, isLoading } = useReorderSuggestions(link, { ...(locationId && { locationId: locationId }) });
   const suggestions = extractSuggestions(data);
 
   if (!link) {
@@ -49,7 +51,12 @@ export default function ReorderSuggestionsView() {
 
   return (
     <Card>
-      <CardContent className="pt-6">
+      <CardHeader>
+        <CardTitle>
+          Recorder Suggestion
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
         <Table>
           <TableHeader>
             <TableRow>
@@ -65,9 +72,21 @@ export default function ReorderSuggestionsView() {
               suggestions.map((row) => (
                 <TableRow key={row.inventoryItemId}>
                   <TableCell>
-                    <Link to={`../${row.inventoryItemId}`} className="font-medium hover:underline">
-                      {row.sku}
-                    </Link>
+                    <div className="flex gap-3 py-1">
+                      <div className="flex w-12 shrink-0 items-center justify-center rounded-md bg-secondary">
+                        <ImageIcon className="h-5 w-5 text-muted-foreground" />
+                      </div>
+                      <div className="min-w-0 space-y-1">
+                        <div className="font-medium leading-tight">
+                          <Link to={`stocks/${row.inventoryItemId}`} relative="path" className="hover:underline">
+                            {row.productName}
+                          </Link>
+                        </div>
+                        <div className="text-xs text-muted-foreground space-y-1">
+                          <div>{row.sku}</div>
+                        </div>
+                      </div>
+                    </div>
                   </TableCell>
                   <TableCell className="tabular-nums">{row.currentAvailable}</TableCell>
                   <TableCell className="tabular-nums">{row.reorderPoint}</TableCell>

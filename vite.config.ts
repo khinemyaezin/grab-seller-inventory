@@ -20,6 +20,7 @@ export default defineConfig(({ mode }) => {
         manifest: true,
         dts: { generateTypes: { tsConfigPath: "./tsconfig.app.json", abortOnError: true } },
         exposes: {
+          "./DashboardRoutes": "./src/app/DashboardRoutes.tsx",
           "./LocationRoutes": "./src/app/LocationRoutes.tsx",
           "./StockRoutes": "./src/app/StockRoutes.tsx",
         },
@@ -29,7 +30,8 @@ export default defineConfig(({ mode }) => {
           "react-router": { singleton: true, requiredVersion: "7.18.0" },
           "@tanstack/react-query": { singleton: true, requiredVersion: "5.99.2" },
           "@khinemyaezin/seller-api": { singleton: true, requiredVersion: "^1.0.1-canary-16cfab0" },
-          "@khinemyaezin/seller-ui": { singleton: true, requiredVersion: "^1.0.1-canary-16cfab0" }
+          "@khinemyaezin/seller-ui": { singleton: true, requiredVersion: "^1.0.1-canary-16cfab0" },
+          "recharts": { singleton: true }
         },
       }),
     ],

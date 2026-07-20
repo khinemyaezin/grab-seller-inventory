@@ -21,63 +21,6 @@ export type ItemTableProps = {
   onPageChange?: (page: number) => void;
 };
 
-type StockHealth = "healthy" | "reorder_soon" | "low_stock" | "out_of_stock";
-
-type StockHealthInfo = {
-  kind: StockHealth;
-  label: string;
-  percent: number;
-  accentClass: string;
-  barClass: string;
-};
-
-const STOCK_HEALTH: Record<
-  StockHealth,
-  Pick<StockHealthInfo, "label" | "accentClass" | "barClass">
-> = {
-  healthy: {
-    label: "Healthy",
-    accentClass: "text-emerald-600 dark:text-emerald-400",
-    barClass: "bg-emerald-500",
-  },
-  reorder_soon: {
-    label: "Reorder Soon",
-    accentClass: "text-amber-600 dark:text-amber-400",
-    barClass: "bg-amber-500",
-  },
-  low_stock: {
-    label: "Low Stock",
-    accentClass: "text-red-600 dark:text-red-400",
-    barClass: "bg-red-500",
-  },
-  out_of_stock: {
-    label: "Out of Stock",
-    accentClass: "text-muted-foreground",
-    barClass: "bg-muted-foreground/50",
-  },
-};
-
-function getStockHealth(item: InventoryItemResponse): StockHealthInfo {
-  const capacity =
-    item.maxStock && item.maxStock > 0
-      ? item.maxStock
-      : Math.max(item.onHand, item.reorderPoint * 5, item.available, 1);
-  const percent = Math.min(100, Math.max(0, Math.round((item.available / capacity) * 100)));
-
-  let kind: StockHealth;
-  if (item.available <= 0 || item.status === "OUT_OF_STOCK") {
-    kind = "out_of_stock";
-  } else if (item.available <= item.reorderPoint) {
-    kind = "low_stock";
-  } else if (item.available <= item.reorderPoint * 2) {
-    kind = "reorder_soon";
-  } else {
-    kind = "healthy";
-  }
-
-  return { kind, percent, ...STOCK_HEALTH[kind] };
-}
-
 export default function ItemTable({ filter, onPageChange }: ItemTableProps) {
   const searchLink = useInventoryLink("searchInventoryItems");
   const { data } = useItems(searchLink, filter);
@@ -130,7 +73,6 @@ export default function ItemTable({ filter, onPageChange }: ItemTableProps) {
 }
 
 function ItemTableRow({ item }: { item: InventoryItemResponse }) {
-  const health = getStockHealth(item);
   const title = item.productName?.trim() || item.sku;
 
   return (
@@ -158,7 +100,7 @@ function ItemTableRow({ item }: { item: InventoryItemResponse }) {
         </div>
       </TableCell>
       <UnitsCell value={item.onHand} />
-      <UnitsCell value={item.available} className={health.accentClass} />
+      <UnitsCell value={item.available} />
       <UnitsCell value={item.inTransit ?? 0} />
       <UnitsCell value={item.reserved} />
       <UnitsCell value={item.reorderPoint} />

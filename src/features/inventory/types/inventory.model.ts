@@ -15,6 +15,7 @@ export interface InventoryRoot {
   createInventoryItem?: HateoasLink;
   inventoryItem?: HateoasLink;
   checkInventoryExistence?: HateoasLink;
+  inventorySummary?: HateoasLink;
   searchProductVariants?: HateoasLink;
   reorderSuggestions?: HateoasLink;
 }
