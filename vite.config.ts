@@ -23,6 +23,7 @@ export default defineConfig(({ mode }) => {
           "./DashboardRoutes": "./src/app/DashboardRoutes.tsx",
           "./LocationRoutes": "./src/app/LocationRoutes.tsx",
           "./StockRoutes": "./src/app/StockRoutes.tsx",
+          "./ProductInventoryWidget": "./src/features/inventory/components/item/product-inventory-widget-exposed.tsx"
         },
         shared: {
           "react": { singleton: true, requiredVersion: "19.2.4" },
