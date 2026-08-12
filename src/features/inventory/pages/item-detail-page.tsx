@@ -16,7 +16,7 @@ export default function ItemDetailPage() {
   useShellBreadcrumb(title);
 
   const toast = (type: "success" | "error", message: string) =>
-    platform?.events.publish("shell:toast:v1", { type, message, position: "top-center" });
+    platform?.events.emit("shell:toast:v1", { type, message, position: "top-center" });
 
   const handleEvent = (event: ItemLifecycleEvent) => {
     switch (event.type) {

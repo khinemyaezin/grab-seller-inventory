@@ -8,7 +8,7 @@ export default function LocationsPage() {
   const platform = usePlatform();
 
   const toast = (type: "success" | "error", message: string) =>
-    platform?.events.publish("shell:toast:v1", { type, message, position: "top-center" });
+    platform?.events.emit("shell:toast:v1", { type, message, position: "top-center" });
 
   const handleEvent = (event: LocationLifecycleEvent) => {
     switch (event.type) {
