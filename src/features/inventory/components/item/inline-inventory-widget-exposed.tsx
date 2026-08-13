@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { EntryLinkProvider, PlatformProvider } from "@khinemyaezin/seller-ui";
 import { type HateoasLink } from "@khinemyaezin/seller-api";
 import {
@@ -8,14 +8,14 @@ import {
   type PlatformEvents,
   type SellerPlatform,
 } from "@khinemyaezin/seller-contracts";
-import ProductInventoryWidget from "./product-inventory-widget";
+import InlineInventoryWidget from "./inline-inventory-widget";
 
-export type ProductInventoryWidgetExposedProps = ExtensionMountProps & {
+export type InlineInventoryWidgetExposedProps = ExtensionMountProps & {
   entryLink: HateoasLink;
   platform?: SellerPlatform;
 };
 
-export type InventoryWidgetHandle = {
+export type InlineInventoryWidgetHandle = {
   validate: () => Promise<{
     value?: InventoryPayload;
     errors?: Record<string, string>;
@@ -34,16 +34,16 @@ function resolveMountSnapshot(
   return { ...own, ...identity };
 }
 
-export default function ProductInventoryWidgetExposed({
+export default function InlineInventoryWidgetExposed({
   instanceId,
-  slotId = PRODUCT_EXTENSION_SLOTS.CREATE_INVENTORY,
+  slotId = PRODUCT_EXTENSION_SLOTS.CREATE_INVENTORY_INLINE,
   context,
   platform,
   entryLink,
-}: ProductInventoryWidgetExposedProps) {
+}: InlineInventoryWidgetExposedProps) {
   const events = platform?.events;
-  const ref = useRef<InventoryWidgetHandle>(null);
-  const producerId = useId();
+  const ref = useRef<InlineInventoryWidgetHandle>(null);
+  const producerId = instanceId;
   const [payload, setPayload] = useState<Partial<InventoryPayload>>(
     (context as InventoryPayload),
   );
@@ -114,11 +114,7 @@ export default function ProductInventoryWidgetExposed({
   return (
     <PlatformProvider platform={platform}>
       <EntryLinkProvider link={entryLink}>
-        <ProductInventoryWidget
-          ref={ref}
-          value={payload}
-          onChange={onChange}
-        />
+        <InlineInventoryWidget ref={ref} value={payload} onChange={onChange} />
       </EntryLinkProvider>
     </PlatformProvider>
   );

@@ -12,43 +12,41 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@khinemyaezin/seller-ui/components/select";
-import { useEffect } from "react";
-import type { HateoasLink } from "@khinemyaezin/seller-api";
-import type { SellerPlatform } from "@khinemyaezin/seller-contracts";
+import {
+  InventoryPayload,
+  InventoryPayloadSchema,
+} from "@khinemyaezin/seller-contracts";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Controller, useForm } from "react-hook-form";
+import { Ref, useCallback, useEffect, useImperativeHandle } from "react";
+import { useDebounce } from "@khinemyaezin/seller-ui";
 import { useInventoryLink } from "@/features/inventory/hooks/use-root";
 import { useLocations } from "@/features/inventory/hooks/use-locations";
-
-export type InventoryLineValue = {
-  sku: string;
-  locationId: string;
-  initialQuantity: number | "";
-  safetyStock?: number | "";
-  reorderPoint?: number | "";
-  reorderQuantity?: number | "";
-  maxStock?: number | "";
-};
-
-export type InventoryFieldName =
-  | "locationId"
-  | "initialQuantity"
-  | "safetyStock";
+import type { InventoryWidgetHandle } from "./product-inventory-widget-exposed";
 
 export type ProductInventoryWidgetProps = {
-  sku: string;
-  value: InventoryLineValue;
-  onChange: (next: InventoryLineValue) => void;
-  errors?: Partial<Record<InventoryFieldName, string>>;
-  onBlur?: (field: InventoryFieldName) => void;
-  platform?: SellerPlatform;
-  entryLink: HateoasLink;
+  value?: Partial<InventoryPayload>;
+  onChange: (value: InventoryPayload) => void;
+  ref: Ref<InventoryWidgetHandle>;
 };
 
+const DEFAULT_VALUE: InventoryPayload = {
+  sku: "",
+  locationId: "",
+  initialQuantity: 0,
+  safetyStock: 0,
+};
+
+const schema = z.fromJSONSchema(InventoryPayloadSchema) as z.ZodType<
+  InventoryPayload,
+  InventoryPayload
+>;
+
 export default function ProductInventoryWidget({
-  sku,
   value,
   onChange,
-  errors,
-  onBlur,
+  ref,
 }: ProductInventoryWidgetProps) {
   const searchLocationLink = useInventoryLink("searchLocation");
   const { data: locationsData } = useLocations(searchLocationLink, {
@@ -57,61 +55,106 @@ export default function ProductInventoryWidget({
   });
   const locations = locationsData?._embedded?.locationResponseList ?? [];
 
+  const form = useForm<InventoryPayload>({
+    defaultValues: DEFAULT_VALUE,
+    resolver: zodResolver(schema),
+    mode: "onChange",
+  });
+  const { reset, register, watch, control, setValue, formState: { errors } } = form;
+  const locationId = watch("locationId");
+  const sku = watch("sku");
+
   useEffect(() => {
-    if (!value?.locationId && locations.length > 0) {
-      onChange({
-        ...value,
-        sku: sku?.trim() || value?.sku || "",
-        locationId: locations[0].id,
-      });
+    if (value) {
+      reset({ ...DEFAULT_VALUE, ...value });
     }
-  }, [value, locations, onChange, sku]);
+  }, [value]);
 
-  const fieldId = sku?.trim() || value?.sku || "line";
-  const locationId = value?.locationId ?? "";
-  const initialQuantity = value?.initialQuantity ?? "";
-  const safetyStock = value?.safetyStock ?? "";
+  useEffect(() => {
+    if (locationId || locations.length === 0) return;
+    setValue("locationId", locations[0].id, { shouldValidate: true, shouldDirty: true });
+  }, [locationId, locations, setValue]);
 
-  const locationError = errors?.locationId;
-  const quantityError = errors?.initialQuantity;
+  const emitChange = useCallback(async () => {
+    const isValid = await form.trigger();
+    if (isValid) {
+      onChange(form.getValues());
+    }
+  }, [form, onChange]);
+
+  const { debounceFn: debouncedEmitChange } = useDebounce(emitChange, 300);
+
+  useEffect(() => {
+    const subscription = watch((_value, { name }) => {
+      if (name) {
+        debouncedEmitChange();
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [watch, debouncedEmitChange]);
+
+  useImperativeHandle(ref, () => {
+    return {
+      validate: async () => {
+        const isValid = await form.trigger();
+        if (isValid) {
+          return { value: form.getValues() };
+        }
+
+        const formErrors: Record<string, string> = {};
+        Object.entries(form.formState.errors).forEach(([key, err]) => {
+          if (err?.message) {
+            formErrors[key] = err.message as string;
+          }
+        });
+
+        return { errors: formErrors };
+      },
+    };
+  }, [form]);
+
+  const fieldId = sku?.trim() || "line";
 
   return (
     <FieldGroup className="grid gap-4">
-      <Field data-invalid={!!locationError}>
+      <input type="hidden" {...register("sku")} />
+
+      <Field data-invalid={!!errors.locationId}>
         <FieldLabel>Location</FieldLabel>
-        <Select
-          value={locationId}
-          onValueChange={(nextLocationId) => {
-            onChange({
-              ...value,
-              sku: sku?.trim() || value.sku || "",
-              locationId: nextLocationId,
-            });
-            onBlur?.("locationId");
-          }}
-        >
-          <SelectTrigger aria-invalid={!!locationError}>
-            <SelectValue placeholder="Select a location" />
-          </SelectTrigger>
-          <SelectContent>
-            {locations.length === 0 ? (
-              <div className="text-sm text-muted-foreground p-2 text-center">
-                No locations available.
-              </div>
-            ) : (
-              locations.map((location) => (
-                <SelectItem key={location.id} value={location.id}>
-                  {location.name} {location.code ? `(${location.code})` : ""}
-                </SelectItem>
-              ))
-            )}
-          </SelectContent>
-        </Select>
-        {locationError ? <FieldError>{locationError}</FieldError> : null}
+        <Controller
+          control={control}
+          name="locationId"
+          render={({ field }) => (
+            <Select
+              value={field.value || undefined}
+              onValueChange={field.onChange}
+            >
+              <SelectTrigger aria-invalid={!!errors.locationId}>
+                <SelectValue placeholder="Select a location" />
+              </SelectTrigger>
+              <SelectContent>
+                {locations.length === 0 ? (
+                  <div className="text-sm text-muted-foreground p-2 text-center">
+                    No locations available.
+                  </div>
+                ) : (
+                  locations.map((location) => (
+                    <SelectItem key={location.id} value={location.id}>
+                      {location.name} {location.code ? `(${location.code})` : ""}
+                    </SelectItem>
+                  ))
+                )}
+              </SelectContent>
+            </Select>
+          )}
+        />
+        {errors.locationId ? (
+          <FieldError errors={[errors.locationId]} />
+        ) : null}
       </Field>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <Field data-invalid={!!quantityError}>
+        <Field data-invalid={!!errors.initialQuantity}>
           <FieldLabel htmlFor={`inventory-${fieldId}-qty`}>
             Initial quantity
           </FieldLabel>
@@ -119,23 +162,16 @@ export default function ProductInventoryWidget({
             id={`inventory-${fieldId}-qty`}
             type="number"
             min={0}
-            value={initialQuantity}
             placeholder="0"
-            onChange={(event) => {
-              const raw = event.target.value;
-              onChange({
-                ...value,
-                sku: sku?.trim() || value.sku || "",
-                initialQuantity: raw === "" ? "" : Number(raw),
-              });
-            }}
-            onBlur={() => onBlur?.("initialQuantity")}
-            aria-invalid={!!quantityError}
+            aria-invalid={!!errors.initialQuantity}
+            {...register("initialQuantity", { valueAsNumber: true })}
           />
-          {quantityError ? <FieldError>{quantityError}</FieldError> : null}
+          {errors.initialQuantity ? (
+            <FieldError errors={[errors.initialQuantity]} />
+          ) : null}
         </Field>
 
-        <Field>
+        <Field data-invalid={!!errors.safetyStock}>
           <FieldLabel htmlFor={`inventory-${fieldId}-safety`}>
             Safety stock
           </FieldLabel>
@@ -143,18 +179,13 @@ export default function ProductInventoryWidget({
             id={`inventory-${fieldId}-safety`}
             type="number"
             min={0}
-            value={safetyStock}
             placeholder="0"
-            onChange={(event) => {
-              const raw = event.target.value;
-              onChange({
-                ...value,
-                sku: sku?.trim() || value.sku || "",
-                safetyStock: raw === "" ? "" : Number(raw),
-              });
-            }}
-            onBlur={() => onBlur?.("safetyStock")}
+            aria-invalid={!!errors.safetyStock}
+            {...register("safetyStock", { valueAsNumber: true })}
           />
+          {errors.safetyStock ? (
+            <FieldError errors={[errors.safetyStock]} />
+          ) : null}
         </Field>
       </div>
     </FieldGroup>

@@ -23,7 +23,8 @@ export default defineConfig(({ mode }) => {
           "./DashboardRoutes": "./src/app/DashboardRoutes.tsx",
           "./LocationRoutes": "./src/app/LocationRoutes.tsx",
           "./StockRoutes": "./src/app/StockRoutes.tsx",
-          "./ProductInventoryWidget": "./src/features/inventory/components/item/product-inventory-widget-exposed.tsx"
+          "./ProductInventoryWidget": "./src/features/inventory/components/item/product-inventory-widget-exposed.tsx",
+          "./InlineInventoryWidget": "./src/features/inventory/components/item/inline-inventory-widget-exposed.tsx",
         },
         shared: {
           "react": { singleton: true, requiredVersion: "19.2.4" },
@@ -32,6 +33,7 @@ export default defineConfig(({ mode }) => {
           "@tanstack/react-query": { singleton: true, requiredVersion: "5.99.2" },
           "@khinemyaezin/seller-api": { singleton: true },
           "@khinemyaezin/seller-ui": { singleton: true },
+          "react-hook-form": { singleton: true, requiredVersion: "7.74.0" },
           "recharts": { singleton: true }
         },
       }),
