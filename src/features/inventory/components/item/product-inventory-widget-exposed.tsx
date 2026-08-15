@@ -2,6 +2,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import { EntryLinkProvider, PlatformProvider } from "@khinemyaezin/seller-ui";
 import { type HateoasLink } from "@khinemyaezin/seller-api";
 import {
+  InventoryCreateContext,
   InventoryPayload,
   PRODUCT_EXTENSION_SLOTS,
   type ExtensionMountProps,
@@ -20,18 +21,26 @@ export type InventoryWidgetHandle = {
     value?: InventoryPayload;
     errors?: Record<string, string>;
   }>;
+  getValues: () => InventoryPayload;
 };
+
+function mergeFromHydrate<T extends object>(
+  prev: T | undefined,
+  current: T | undefined,
+  context: Partial<T> | undefined,
+): T {
+  return { ...prev, ...current, ...context } as T;
+}
 
 function resolveMountSnapshot(
   events: PlatformEvents,
   groupId: string,
-): Partial<InventoryPayload> | undefined {
-  const own = events.getSnapshot("extension:inventory:updated:v1", groupId)
-    ?.payload as InventoryPayload | undefined;
-  const identity = events.getSnapshot("extension:inventory:hydrate:v1", groupId)
-    ?.payload as Partial<InventoryPayload> | undefined;
-  if (!own && !identity) return undefined;
-  return { ...own, ...identity };
+) {
+  const payload = events.getSnapshot("extension:inventory:new:updated:v1", groupId)
+    ?.payload;
+  const context = events.getSnapshot("extension:inventory:new:hydrate:v1", groupId)
+    ?.payload;
+  return { payload, context };
 }
 
 export default function ProductInventoryWidgetExposed({
@@ -44,17 +53,20 @@ export default function ProductInventoryWidgetExposed({
   const events = platform?.events;
   const ref = useRef<InventoryWidgetHandle>(null);
   const producerId = useId();
-  const [payload, setPayload] = useState<Partial<InventoryPayload>>(
-    (context as InventoryPayload),
-  );
+  const [payload, setPayload] = useState<InventoryPayload>();
+  const [ctx, setContext] = useState<InventoryCreateContext>();
 
   useEffect(() => {
     if (!groupId) return;
     if (!events) return;
 
     const snapshot = resolveMountSnapshot(events, groupId);
-    if (snapshot) {
-      setPayload((prev) => ({ ...prev, ...snapshot }));
+    const current = ref.current?.getValues();
+    if (snapshot.payload || snapshot.context) {
+      setPayload((prev) => mergeFromHydrate(prev, current, { ...snapshot.payload, ...snapshot.context }));
+    }
+    if (snapshot.context) {
+      setContext((prev) => ({ ...prev, ...snapshot.context } as InventoryCreateContext));
     }
 
     const unsubs = [
@@ -75,25 +87,21 @@ export default function ProductInventoryWidgetExposed({
             : { payload: result?.value }),
         });
       }),
-      events.subscribe("extension:inventory:hydrate:v1", (msg) => {
+      events.subscribe("extension:inventory:new:hydrate:v1", (msg) => {
         if (msg.producerId === producerId) return;
         if (msg.groupId && msg.groupId !== groupId) return;
         if (msg.slotId && msg.slotId !== slotId) return;
         if (!msg.payload) return;
 
-        setPayload((prev) => ({
-          ...prev,
-          ...(msg.payload as Partial<InventoryPayload>),
-        }));
+        setContext(msg.payload);
+        setPayload((prev) => mergeFromHydrate(prev, ref.current?.getValues(), msg.payload));
       }),
-      events.subscribe("extension:inventory:updated:v1", (msg) => {
+      events.subscribe("extension:inventory:new:updated:v1", (msg) => {
         if (msg.producerId === producerId) return;
         if (msg.groupId !== groupId) return;
         if (!msg.payload) return;
-        setPayload((prev) => ({
-          ...prev,
-          ...(msg.payload as Partial<InventoryPayload>),
-        }));
+
+        setPayload(msg.payload);
       }),
     ];
 
@@ -101,7 +109,7 @@ export default function ProductInventoryWidgetExposed({
   }, [events, groupId, slotId, producerId]);
 
   const onChange = (next: InventoryPayload) => {
-    events?.setState("extension:inventory:updated:v1", {
+    events?.setState("extension:inventory:new:updated:v1", {
       producerId,
       groupId,
       slotId,
@@ -116,6 +124,7 @@ export default function ProductInventoryWidgetExposed({
       <EntryLinkProvider link={entryLink}>
         <ProductInventoryWidget
           ref={ref}
+          context={ctx}
           value={payload}
           onChange={onChange}
         />

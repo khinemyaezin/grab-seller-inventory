@@ -13,7 +13,6 @@ import { useInventoryLink } from "@/features/inventory/hooks/use-root";
 import { useReorderSuggestions } from "@/features/inventory/hooks/use-items";
 import type { ReorderSuggestionResponse, ReorderSuggestionsResponse } from "@/features/inventory/types";
 import { ImageIcon } from "lucide-react";
-import { routes } from "@khinemyaezin/seller-contracts";
 
 function extractSuggestions(data?: ReorderSuggestionsResponse): ReorderSuggestionResponse[] {
   const embedded = data?._embedded;

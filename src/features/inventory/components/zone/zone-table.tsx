@@ -155,7 +155,7 @@ function ZoneAccordionItem({
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="font-semibold leading-none">{zone.code}</span>
                   <Badge variant="secondary">{zone.type.replace(/_/g, " ")}</Badge>
-                  <Badge variant={zone.active ? "success" : "secondary"}>
+                  <Badge >
                     {zone.active ? "Active" : "Inactive"}
                   </Badge>
                 </div>

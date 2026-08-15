@@ -43,7 +43,7 @@ export default function ItemReservationsTable({ link }: ItemReservationsTablePro
               </TableCell>
               <TableCell>{reservation.quantity}</TableCell>
               <TableCell>
-                <Badge variant={reservation.status === "ACTIVE" ? "success" : "secondary"}>
+                <Badge >
                   {reservation.status}
                 </Badge>
               </TableCell>

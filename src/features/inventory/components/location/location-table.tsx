@@ -147,7 +147,7 @@ function LocationTableRow({ location, onLifecycleEvent }: LocationTableRowProps)
         {[location.address.city, location.address.country].filter(Boolean).join(", ")}
       </TableCell>
       <TableCell>
-        <Badge variant={location.active ? "success" : "secondary"}>
+        <Badge>
           {location.active ? "Active" : "Inactive"}
         </Badge>
       </TableCell>

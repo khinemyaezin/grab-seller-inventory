@@ -4,19 +4,22 @@ import {
 } from "@khinemyaezin/seller-ui/components/field";
 import { Input } from "@khinemyaezin/seller-ui/components/input";
 import {
+  InventoryCreateContext,
   InventoryPayload,
   InventoryPayloadSchema,
 } from "@khinemyaezin/seller-contracts";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { Ref, useCallback, useEffect, useImperativeHandle } from "react";
+import { Ref, useCallback, useEffect, useImperativeHandle, useRef } from "react";
 import { useDebounce } from "@khinemyaezin/seller-ui";
 import { useInventoryLink } from "@/features/inventory/hooks/use-root";
 import { useLocations } from "@/features/inventory/hooks/use-locations";
 import type { InlineInventoryWidgetHandle } from "./inline-inventory-widget-exposed";
+import { collectFormErrors } from "./inventory-widget-utils";
 
 export type InlineInventoryWidgetProps = {
+  context?: InventoryCreateContext;
   value?: Partial<InventoryPayload>;
   onChange: (value: InventoryPayload) => void;
   ref: Ref<InlineInventoryWidgetHandle>;
@@ -24,9 +27,7 @@ export type InlineInventoryWidgetProps = {
 
 const DEFAULT_VALUE: InventoryPayload = {
   sku: "",
-  locationId: "",
-  initialQuantity: 0,
-  safetyStock: 0,
+  locations: [],
 };
 
 const schema = z.fromJSONSchema(InventoryPayloadSchema) as z.ZodType<
@@ -35,6 +36,7 @@ const schema = z.fromJSONSchema(InventoryPayloadSchema) as z.ZodType<
 >;
 
 export default function InlineInventoryWidget({
+  context,
   value,
   onChange,
   ref,
@@ -44,44 +46,72 @@ export default function InlineInventoryWidget({
     page: 0,
     size: 100,
   });
-  const locations = locationsData?._embedded?.locationResponseList ?? [];
+  const locations = (locationsData?._embedded?.locationResponseList ?? [])
+    .filter((location) => location.active);
 
   const form = useForm<InventoryPayload>({
     defaultValues: DEFAULT_VALUE,
     resolver: zodResolver(schema),
     mode: "onChange",
   });
-  const { reset, register, watch, setValue, formState: { errors } } = form;
-  const locationId = watch("locationId");
+  const { reset, register, watch, formState: { errors } } = form;
+  const isSeeded = useRef(false);
 
   useEffect(() => {
-    if (value) {
-      reset({ ...DEFAULT_VALUE, ...value });
-    }
-  }, [value]);
+    if (isSeeded.current) return;
+    if (!locations.length) return;
+
+    const singleLocation = locations[0];
+    const initialLocations = value?.locations?.length
+      ? value.locations
+      : [{
+          locationId: singleLocation.id,
+          initialQuantity: 0,
+          safetyStock: 0,
+        }];
+
+    reset({ ...DEFAULT_VALUE, ...value, ...context, locations: initialLocations });
+    isSeeded.current = true;
+    void form.trigger();
+  }, [locations, value, context, reset, form]);
 
   useEffect(() => {
-    if (locationId || locations.length === 0) return;
-    setValue("locationId", locations[0].id, { shouldValidate: true, shouldDirty: true });
-  }, [locationId, locations, setValue]);
+    if (!isSeeded.current || !context) return;
+    const current = form.getValues();
+    reset({ ...current, ...context });
+    void form.trigger();
+  }, [context, reset, form]);
+
+  const prevValueRef = useRef(value);
+  useEffect(() => {
+    if (!isSeeded.current) return;
+    if (value === prevValueRef.current) return;
+    prevValueRef.current = value;
+
+    const current = form.getValues();
+    const nextLocations = value?.locations?.length
+      ? value.locations
+      : current.locations;
+
+    reset({ ...current, ...value, locations: nextLocations });
+    void form.trigger();
+  }, [value, reset, form]);
 
   const emitChange = useCallback(async () => {
-    const isValid = await form.trigger();
-    if (isValid) {
-      onChange(form.getValues());
-    }
+    await form.trigger();
+    onChange(form.getValues());
   }, [form, onChange]);
 
   const { debounceFn: debouncedEmitChange } = useDebounce(emitChange, 300);
 
   useEffect(() => {
-    const subscription = watch((_value, { name }) => {
-      if (name) {
+    const subscription = watch((_next, { name }) => {
+      if (name && locations.length === 1) {
         debouncedEmitChange();
       }
     });
     return () => subscription.unsubscribe();
-  }, [watch, debouncedEmitChange]);
+  }, [watch, debouncedEmitChange, locations.length]);
 
   useImperativeHandle(ref, () => {
     return {
@@ -91,35 +121,45 @@ export default function InlineInventoryWidget({
           return { value: form.getValues() };
         }
 
-        const formErrors: Record<string, string> = {};
-        Object.entries(form.formState.errors).forEach(([key, err]) => {
-          if (err?.message) {
-            formErrors[key] = err.message as string;
-          }
-        });
-
-        return { errors: formErrors };
+        return { errors: collectFormErrors(form.formState.errors) };
       },
+      getValues: () => form.getValues(),
     };
   }, [form]);
 
+  if (locations.length === 0) {
+    return null;
+  }
+
+  if (locations.length > 1) {
+    return (
+      <Field className="gap-1">
+        <input type="hidden" {...register("sku")} />
+        <span className="text-sm">0</span>
+      </Field>
+    );
+  }
+
+  const quantityError = errors.locations?.[0]?.initialQuantity;
+
   return (
-    <Field data-invalid={!!errors.initialQuantity} className="gap-1">
+    <Field data-invalid={!!quantityError} className="gap-1">
       <input type="hidden" {...register("sku")} />
-      <input type="hidden" {...register("locationId")} />
-      <input type="hidden" {...register("safetyStock", { valueAsNumber: true })} />
+      <input type="hidden" {...register("locations.0.locationId")} />
+      <input
+        type="hidden"
+        {...register("locations.0.safetyStock", { valueAsNumber: true })}
+      />
       <Input
         id="inline-inventory-qty"
         type="number"
         min={0}
         placeholder="0"
         aria-label="Initial quantity"
-        aria-invalid={!!errors.initialQuantity}
-        {...register("initialQuantity", { valueAsNumber: true })}
+        aria-invalid={!!quantityError}
+        {...register("locations.0.initialQuantity", { valueAsNumber: true })}
       />
-      {errors.initialQuantity ? (
-        <FieldError errors={[errors.initialQuantity]} />
-      ) : null}
+      {quantityError ? <FieldError errors={[quantityError]} /> : null}
     </Field>
   );
 }

@@ -91,7 +91,7 @@ export default function ItemDetailView({ itemId, onLifecycleEvent }: ItemDetailV
               <div className="min-w-0 space-y-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="text-lg font-bold">{item.sku}</span>
-                  <Badge variant={item.status === "ACTIVE" ? "success" : "secondary"} className="uppercase text-[10px] px-2 py-0.5">
+                  <Badge className="uppercase text-[10px] px-2 py-0.5">
                     {item.status}
                   </Badge>
                 </div>

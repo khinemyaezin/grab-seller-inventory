@@ -2,40 +2,45 @@ import {
   Field,
   FieldError,
   FieldGroup,
-  FieldLabel,
 } from "@khinemyaezin/seller-ui/components/field";
 import { Input } from "@khinemyaezin/seller-ui/components/input";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@khinemyaezin/seller-ui/components/select";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@khinemyaezin/seller-ui/components/table";
 import {
+  InventoryCreateContext,
   InventoryPayload,
   InventoryPayloadSchema,
+  type InventoryLocationStock,
 } from "@khinemyaezin/seller-contracts";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, useForm } from "react-hook-form";
-import { Ref, useCallback, useEffect, useImperativeHandle } from "react";
+import { useFieldArray, useForm } from "react-hook-form";
+import { Ref, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
 import { useDebounce } from "@khinemyaezin/seller-ui";
 import { useInventoryLink } from "@/features/inventory/hooks/use-root";
 import { useLocations } from "@/features/inventory/hooks/use-locations";
 import type { InventoryWidgetHandle } from "./product-inventory-widget-exposed";
+import { LocationPickerDialog } from "./location-picker-dialog";
+import { collectFormErrors } from "./inventory-widget-utils";
+import { Button } from "@khinemyaezin/seller-ui/components/button";
+import { Pencil } from "lucide-react";
 
 export type ProductInventoryWidgetProps = {
-  value?: Partial<InventoryPayload>;
+  context?: InventoryCreateContext;
+  value?: InventoryPayload;
   onChange: (value: InventoryPayload) => void;
   ref: Ref<InventoryWidgetHandle>;
 };
 
 const DEFAULT_VALUE: InventoryPayload = {
   sku: "",
-  locationId: "",
-  initialQuantity: 0,
-  safetyStock: 0,
+  locations: [],
 };
 
 const schema = z.fromJSONSchema(InventoryPayloadSchema) as z.ZodType<
@@ -44,6 +49,7 @@ const schema = z.fromJSONSchema(InventoryPayloadSchema) as z.ZodType<
 >;
 
 export default function ProductInventoryWidget({
+  context,
   value,
   onChange,
   ref,
@@ -53,39 +59,72 @@ export default function ProductInventoryWidget({
     page: 0,
     size: 100,
   });
-  const locations = locationsData?._embedded?.locationResponseList ?? [];
+  const locations = useMemo(() => {
+    return (locationsData?._embedded?.locationResponseList ?? [])
+      .filter((location) => location.active);
+  }, [locationsData]);
+
+  const locationById = useMemo(
+    () => new Map(locations.map((location) => [location.id, location])),
+    [locations],
+  );
+
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   const form = useForm<InventoryPayload>({
     defaultValues: DEFAULT_VALUE,
     resolver: zodResolver(schema),
     mode: "onChange",
   });
-  const { reset, register, watch, control, setValue, formState: { errors } } = form;
-  const locationId = watch("locationId");
-  const sku = watch("sku");
+  const { control, reset, register, watch, formState: { errors } } = form;
+  const { fields, replace } = useFieldArray({ control, name: "locations" });
+  const isSeeded = useRef(false);
 
   useEffect(() => {
-    if (value) {
-      reset({ ...DEFAULT_VALUE, ...value });
-    }
-  }, [value]);
+    if (isSeeded.current) return;
+    if (!locations.length) return;
+    const initialLocations = value?.locations?.length
+      ? value.locations
+      : locations.map((loc) => ({
+        locationId: loc.id,
+        initialQuantity: 0,
+        safetyStock: 0,
+      }));
+    reset({ ...DEFAULT_VALUE, ...value, ...context, locations: initialLocations });
+    isSeeded.current = true;
+    void form.trigger();
+  }, [locations, value, context, reset, form]);
 
   useEffect(() => {
-    if (locationId || locations.length === 0) return;
-    setValue("locationId", locations[0].id, { shouldValidate: true, shouldDirty: true });
-  }, [locationId, locations, setValue]);
+    if (!isSeeded.current || !context) return;
+    const current = form.getValues();
+    reset({ ...current, ...context });
+    void form.trigger();
+  }, [context, reset, form]);
+
+  const prevValueRef = useRef(value);
+  useEffect(() => {
+    if (!isSeeded.current) return;
+    if (value === prevValueRef.current) return;
+    prevValueRef.current = value;
+    const current = form.getValues();
+    const nextLocations = value?.locations?.length
+      ? value.locations
+      : current.locations;
+    reset({ ...current, ...value, locations: nextLocations });
+    void form.trigger();
+  }, [value, reset, form]);
+
 
   const emitChange = useCallback(async () => {
-    const isValid = await form.trigger();
-    if (isValid) {
-      onChange(form.getValues());
-    }
+    await form.trigger();
+    onChange(form.getValues());
   }, [form, onChange]);
 
   const { debounceFn: debouncedEmitChange } = useDebounce(emitChange, 300);
 
   useEffect(() => {
-    const subscription = watch((_value, { name }) => {
+    const subscription = watch((_next, { name }) => {
       if (name) {
         debouncedEmitChange();
       }
@@ -101,93 +140,115 @@ export default function ProductInventoryWidget({
           return { value: form.getValues() };
         }
 
-        const formErrors: Record<string, string> = {};
-        Object.entries(form.formState.errors).forEach(([key, err]) => {
-          if (err?.message) {
-            formErrors[key] = err.message as string;
-          }
-        });
-
-        return { errors: formErrors };
+        return { errors: collectFormErrors(form.formState.errors) };
       },
+      getValues: () => form.getValues(),
     };
   }, [form]);
 
-  const fieldId = sku?.trim() || "line";
+  const applyLocationSelection = (selectedIds: string[]) => {
+    if (selectedIds.length === 0) return;
+
+    const current = form.getValues("locations");
+    const next: InventoryLocationStock[] = locations
+      .filter((location) => selectedIds.includes(location.id))
+      .map((location) => {
+        const existing = current.find((row) => row.locationId === location.id);
+        return {
+          locationId: location.id,
+          initialQuantity: existing?.initialQuantity ?? 0,
+          safetyStock: existing?.safetyStock ?? 0,
+        };
+      });
+
+    replace(next);
+    setPickerOpen(false);
+    void emitChange();
+  };
 
   return (
-    <FieldGroup className="grid gap-4">
+    <FieldGroup className="grid gap-3">
       <input type="hidden" {...register("sku")} />
 
-      <Field data-invalid={!!errors.locationId}>
-        <FieldLabel>Location</FieldLabel>
-        <Controller
-          control={control}
-          name="locationId"
-          render={({ field }) => (
-            <Select
-              value={field.value || undefined}
-              onValueChange={field.onChange}
-            >
-              <SelectTrigger aria-invalid={!!errors.locationId}>
-                <SelectValue placeholder="Select a location" />
-              </SelectTrigger>
-              <SelectContent>
-                {locations.length === 0 ? (
-                  <div className="text-sm text-muted-foreground p-2 text-center">
-                    No locations available.
-                  </div>
-                ) : (
-                  locations.map((location) => (
-                    <SelectItem key={location.id} value={location.id}>
-                      {location.name} {location.code ? `(${location.code})` : ""}
-                    </SelectItem>
-                  ))
-                )}
-              </SelectContent>
-            </Select>
-          )}
-        />
-        {errors.locationId ? (
-          <FieldError errors={[errors.locationId]} />
-        ) : null}
-      </Field>
+      {locations.length === 0 ? (
+        <p className="text-sm text-muted-foreground">No locations available.</p>
+      ) : (
+        <div className="overflow-hidden rounded-xl border">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-muted">
+                <TableHead>
+                  <Button type="button" variant="secondary" size="icon-sm" onClick={() => setPickerOpen(true)}>
+                    <Pencil data-icon="inline-end" />
+                  </Button>
+                </TableHead>
+                <TableHead className="text-muted-foreground">Initial quantity</TableHead>
+                <TableHead className="text-muted-foreground">Safety stock</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {fields.map((field, index) => {
+                const location = locationById.get(field.locationId);
+                return (
+                  <TableRow key={field.id}>
+                    <TableCell className="align-top">
+                      <div className="flex min-h-9 items-center">
+                        <input
+                          type="hidden"
+                          {...register(`locations.${index}.locationId`)}
+                        />
+                        <span className="text-sm">
+                          {location?.name ?? field.locationId}
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="align-top">
+                      <Field data-invalid={!!errors.locations?.[index]?.initialQuantity}>
+                        <Input
+                          id={`inv-loc-${index}-qty`}
+                          type="number"
+                          min={0}
+                          placeholder="0"
+                          aria-label={`initial quantity`}
+                          aria-invalid={!!errors.locations?.[index]?.initialQuantity}
+                          {...register(`locations.${index}.initialQuantity`, {
+                            valueAsNumber: true,
+                          })}
+                        />
+                        {errors.locations?.[index]?.initialQuantity && <FieldError errors={[errors.locations?.[index]?.initialQuantity]} />}
+                      </Field>
+                    </TableCell>
+                    <TableCell className="align-top">
+                      <Field data-invalid={!!errors.locations?.[index]?.safetyStock}>
+                        <Input
+                          id={`inv-loc-${index}-safety`}
+                          type="number"
+                          min={0}
+                          placeholder="0"
+                          aria-label={`safety stock`}
+                          aria-invalid={!!errors.locations?.[index]?.safetyStock}
+                          {...register(`locations.${index}.safetyStock`, {
+                            valueAsNumber: true,
+                          })}
+                        />
+                        {errors.locations?.[index]?.safetyStock && <FieldError errors={[errors.locations?.[index]?.safetyStock]} />}
+                      </Field>
+                    </TableCell>
+                  </TableRow>
+                )
+              })}
+            </TableBody>
+          </Table>
+        </div>
+      )}
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <Field data-invalid={!!errors.initialQuantity}>
-          <FieldLabel htmlFor={`inventory-${fieldId}-qty`}>
-            Initial quantity
-          </FieldLabel>
-          <Input
-            id={`inventory-${fieldId}-qty`}
-            type="number"
-            min={0}
-            placeholder="0"
-            aria-invalid={!!errors.initialQuantity}
-            {...register("initialQuantity", { valueAsNumber: true })}
-          />
-          {errors.initialQuantity ? (
-            <FieldError errors={[errors.initialQuantity]} />
-          ) : null}
-        </Field>
-
-        <Field data-invalid={!!errors.safetyStock}>
-          <FieldLabel htmlFor={`inventory-${fieldId}-safety`}>
-            Safety stock
-          </FieldLabel>
-          <Input
-            id={`inventory-${fieldId}-safety`}
-            type="number"
-            min={0}
-            placeholder="0"
-            aria-invalid={!!errors.safetyStock}
-            {...register("safetyStock", { valueAsNumber: true })}
-          />
-          {errors.safetyStock ? (
-            <FieldError errors={[errors.safetyStock]} />
-          ) : null}
-        </Field>
-      </div>
+      <LocationPickerDialog
+        open={pickerOpen}
+        onOpenChange={setPickerOpen}
+        locations={locations}
+        selectedIds={fields.map((field) => field.locationId)}
+        onApply={applyLocationSelection}
+      />
     </FieldGroup>
   );
 }

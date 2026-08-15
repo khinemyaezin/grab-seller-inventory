@@ -112,7 +112,7 @@ export function BinTable({ zoneId, link, filter, onPageChange, onLifecycleEvent 
                   <div className="min-w-0 space-y-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="font-semibold leading-none">{bin.code}</span>
-                      <Badge variant={bin.active ? "success" : "secondary"}>
+                      <Badge variant={bin.active ? "default" : "secondary"}>
                         {bin.active ? "Active" : "Inactive"}
                       </Badge>
                     </div>
