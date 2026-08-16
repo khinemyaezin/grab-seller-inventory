@@ -45,7 +45,7 @@ export function LocationSummary({ location }: LocationSummaryProps) {
           <Badge variant="secondary">
             {location.type.replace(/_/g, " ")}
           </Badge>
-          <Badge variant={location.active ? "success" : "secondary"}>
+          <Badge>
             {location.active ? "Active" : "Inactive"}
           </Badge>
         </div>

@@ -34,10 +34,13 @@ export default function LocationTable({ filter, onPageChange, onLifecycleEvent }
   const locations = data?._embedded?.locationResponseList ?? [];
   const showPagination = (data?.page.totalPages ?? 0) > 1;
 
+  if(locations.length == 0) 
+    return <NoLocations/>
+
   return (
-    <Table>
+    <Table className="[&_tr>*:first-child]:pl-(--card-spacing) [&_tr>*:last-child]:pr-(--card-spacing)">
       <TableHeader>
-        <TableRow>
+        <TableRow className="bg-muted">
           <TableHead>Name</TableHead>
           <TableHead>Type</TableHead>
           <TableHead>Address</TableHead>
@@ -131,7 +134,7 @@ function LocationTableRow({ location, onLifecycleEvent }: LocationTableRowProps)
           {hasLink(location._links, "self") ? (
             <Link
               to={`${location.id}/zones`}
-              className="text-blue-600 hover:underline"
+              className="hover:underline"
             >
               {location.code}
             </Link>) : (
@@ -147,7 +150,7 @@ function LocationTableRow({ location, onLifecycleEvent }: LocationTableRowProps)
         {[location.address.city, location.address.country].filter(Boolean).join(", ")}
       </TableCell>
       <TableCell>
-        <Badge variant={location.active ? "success" : "secondary"}>
+        <Badge>
           {location.active ? "Active" : "Inactive"}
         </Badge>
       </TableCell>
@@ -191,5 +194,15 @@ function LocationTableRow({ location, onLifecycleEvent }: LocationTableRowProps)
         </DropdownMenu>
       </TableCell>
     </TableRow>
+  );
+}
+function NoLocations() {
+  return (
+    <div className="flex flex-col items-center justify-center gap-1 text-center">
+      <p className="text-base font-semibold text-foreground">No location found</p>
+      <p className="text-sm text-muted-foreground">
+        Try changing the filters or search term
+      </p>
+    </div>
   );
 }

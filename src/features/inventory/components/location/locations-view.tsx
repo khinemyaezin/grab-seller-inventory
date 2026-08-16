@@ -1,5 +1,5 @@
 
-import { Card, CardContent } from "@khinemyaezin/seller-ui/components/card";
+import { Card, CardContent, CardHeader } from "@khinemyaezin/seller-ui/components/card";
 import LocationTable from "./location-table";
 import { Button } from "@khinemyaezin/seller-ui/components/button";
 import { Plus } from "lucide-react";
@@ -17,26 +17,24 @@ export default function LocationsView({ onLifecycleEvent }: LocationsViewProps) 
     const { filter, updateCriteria, updatePage } = useLocationFilter();
 
     return (
-        <Card className="gap-3">
-            <CardContent className="grid gap-6">
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-                    <div className="w-full sm:flex-1">
-                        <LocationsFilter onChange={updateCriteria} />
-                    </div>
-                    {createLocationLink && (
-                        <Button className="self-start sm:self-end" variant="outline" asChild>
-                            <Link to="new">
-                                Add location
-                            </Link>
-                        </Button>
-                    )}
+        <Card>
+            <CardHeader className="flex flex-col sm:flex-row sm:items-end sm:justify-between">
+                <div className="w-full sm:flex-1">
+                    <LocationsFilter onChange={updateCriteria} />
                 </div>
-                <LocationTable
-                    filter={filter}
-                    onPageChange={updatePage}
-                    onLifecycleEvent={onLifecycleEvent}
-                />
-            </CardContent>
+                {createLocationLink && (
+                    <Button className="self-start sm:self-end" variant="outline" asChild>
+                        <Link to="new">
+                            Add location
+                        </Link>
+                    </Button>
+                )}
+            </CardHeader>
+            <LocationTable
+                filter={filter}
+                onPageChange={updatePage}
+                onLifecycleEvent={onLifecycleEvent}
+            />
         </Card>
     );
 }

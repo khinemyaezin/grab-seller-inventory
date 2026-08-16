@@ -11,7 +11,7 @@ export default function ItemNewPage() {
   const navigate = useNavigate();
   const platform = usePlatform();
   const toast = (type: "success" | "error", message: string) =>
-    platform?.events.publish("shell:toast:v1", { type, message, position: "top-center" });
+    platform?.events.emit("shell:toast:v1", { type, message, position: "top-center" });
 
   const handleEvent = (event: ItemLifecycleEvent) => {
     switch (event.type) {
@@ -28,7 +28,7 @@ export default function ItemNewPage() {
   };
 
   return (
-    <div className="container mx-auto max-w-3xl p-6">
+    <div className="container mx-auto max-w-2xl p-6">
       <Header
         title="Add stock item"
         description="Provision inventory for a SKU at a location."
