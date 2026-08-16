@@ -28,7 +28,7 @@ export default function ItemNewPage() {
   };
 
   return (
-    <div className="container mx-auto max-w-3xl p-6">
+    <div className="container mx-auto max-w-2xl p-6">
       <Header
         title="Add stock item"
         description="Provision inventory for a SKU at a location."

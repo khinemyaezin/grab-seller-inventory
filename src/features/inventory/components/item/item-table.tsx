@@ -27,10 +27,13 @@ export default function ItemTable({ filter, onPageChange }: ItemTableProps) {
   const items = data?._embedded?.inventoryResponseList ?? [];
   const showPagination = (data?.page.totalPages ?? 0) > 1;
 
+  if(items.length == 0) 
+    return <NoItems/>
+
   return (
-    <Table>
+    <Table className="[&_tr>*:first-child]:pl-(--card-spacing) [&_tr>*:last-child]:pr-(--card-spacing)">
       <TableHeader>
-        <TableRow>
+        <TableRow className="bg-muted">
           <TableHead>Item</TableHead>
           <TableHead>On Hand</TableHead>
           <TableHead>Available</TableHead>
@@ -110,12 +113,18 @@ function ItemTableRow({ item }: { item: InventoryItemResponse }) {
 function UnitsCell({ value, className }: { value: number; className?: string }) {
   return (
     <TableCell>
-      <div className="space-y-0.5">
-        <div className={`text-base font-semibold leading-none tabular-nums ${className ?? ""}`}>
-          {value}
-        </div>
-        <div className="text-xs text-muted-foreground">units</div>
-      </div>
+      {value}
     </TableCell>
+  );
+}
+
+function NoItems() {
+  return (
+    <div className="flex flex-col items-center justify-center gap-1 text-center">
+      <p className="text-base font-semibold text-foreground">No inventory found</p>
+      <p className="text-sm text-muted-foreground">
+        Try changing the filters or search term
+      </p>
+    </div>
   );
 }

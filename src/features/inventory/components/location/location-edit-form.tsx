@@ -126,8 +126,7 @@ export default function LocationEditForm({ locationId, onLifecycleEvent }: Locat
 
     return (
         <FormProvider {...form}>
-            <form onSubmit={handleSubmit(handleFormSubmit)}
-                className="">
+            <form onSubmit={handleSubmit(handleFormSubmit)}>
                 <Card>
                     <CardContent>
                         <LocationBasicFieldSet />
