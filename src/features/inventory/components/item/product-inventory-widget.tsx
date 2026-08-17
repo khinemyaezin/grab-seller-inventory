@@ -25,11 +25,11 @@ import { Ref, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useS
 import { useDebounce } from "@khinemyaezin/seller-ui";
 import { useInventoryLink } from "@/features/inventory/hooks/use-root";
 import { useLocations } from "@/features/inventory/hooks/use-locations";
-import type { InventoryWidgetHandle } from "./product-inventory-widget-exposed";
 import { LocationPickerDialog } from "./location-picker-dialog";
 import { collectFormErrors } from "./inventory-widget-utils";
 import { Button } from "@khinemyaezin/seller-ui/components/button";
 import { Pencil } from "lucide-react";
+import { InventoryWidgetHandle } from "../../hooks/use-inventory-new-slot";
 
 export type ProductInventoryWidgetProps = {
   context?: InventoryCreateContext;
