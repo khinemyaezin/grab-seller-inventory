@@ -106,4 +106,5 @@ export type {
   AnnounceInTransitFormValues,
   ReceiveInTransitFormValues,
   UpdateReorderConfigFormValues,
+  CreateInventoryItemValues,
 } from "./inventory.form";

@@ -15,14 +15,14 @@ import { Ref, useCallback, useEffect, useImperativeHandle, useRef } from "react"
 import { useDebounce } from "@khinemyaezin/seller-ui";
 import { useInventoryLink } from "@/features/inventory/hooks/use-root";
 import { useLocations } from "@/features/inventory/hooks/use-locations";
-import type { InlineInventoryWidgetHandle } from "./inline-inventory-widget-exposed";
 import { collectFormErrors } from "./inventory-widget-utils";
+import { InventoryWidgetHandle } from "../../hooks/use-inventory-new-slot";
 
 export type InlineInventoryWidgetProps = {
   context?: InventoryCreateContext;
   value?: Partial<InventoryPayload>;
   onChange: (value: InventoryPayload) => void;
-  ref: Ref<InlineInventoryWidgetHandle>;
+  ref: Ref<InventoryWidgetHandle>;
 };
 
 const DEFAULT_VALUE: InventoryPayload = {

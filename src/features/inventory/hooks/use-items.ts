@@ -86,6 +86,7 @@ export function useCreateItemMutation() {
     mutationFn: ({ link, request }) => itemService.createItem(link, request),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["inventory-items"] });
+      queryClient.invalidateQueries({ queryKey: ["inventory-items-for-variant-id"] });
       queryClient.invalidateQueries({ queryKey: ["inventory-coverage"] });
     },
   });
@@ -107,16 +108,13 @@ export function useAdjustStockMutation() {
   const queryClient = useQueryClient();
   return useMutation<InventoryItemResponse, Error, { link: HateoasLink; request: AdjustStockRequest }>({
     mutationFn: ({ link, request }) => itemService.adjustStock(link, request),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["inventory-items"] });
-      queryClient.invalidateQueries({ queryKey: ["inventory-item", data.id] });
-      queryClient.invalidateQueries({ queryKey: ["inventory-item-movements"] });
-    },
+    onSuccess: (data) => invalidateItemQueries(queryClient, data.id),
   });
 }
 
 function invalidateItemQueries(queryClient: ReturnType<typeof useQueryClient>, itemId?: string) {
   queryClient.invalidateQueries({ queryKey: ["inventory-items"] });
+  queryClient.invalidateQueries({ queryKey: ["inventory-items-for-variant-id"] });
   if (itemId) {
     queryClient.invalidateQueries({ queryKey: ["inventory-item", itemId] });
   }
