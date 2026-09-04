@@ -1,4 +1,4 @@
-import { api, toPageParams } from "@khinemyaezin/seller-api";
+import { api, resolveUrlTemplate, toPageParams } from "@khinemyaezin/seller-api";
 import type { HateoasLink, Pageable } from "@khinemyaezin/seller-api";
 import type {
   AdjustStockRequest,
@@ -27,8 +27,12 @@ export const itemService = {
   createItem: (link: HateoasLink, request: CreateInventoryRequest, headers?: Record<string, string>) =>
     api.followLink<InventoryItemResponse>(link, "POST", request, undefined, headers),
 
-  getItem: (link: HateoasLink, headers?: Record<string, string>) =>
-    api.followLink<InventoryItemResponse>(link, "GET", undefined, undefined, headers),
+  getItem: (link: HateoasLink, itemId?: string, headers?: Record<string, string>) => {
+    const resolved = itemId
+      ? resolveUrlTemplate({ inventoryItemId: itemId }, link)
+      : link;
+    return api.followLink<InventoryItemResponse>(resolved, "GET", undefined, undefined, headers);
+  },
 
   searchItems: (link: HateoasLink, filters?: ItemsFilterForm & Pageable) => {
     const { page = 0, size = 20, ...body } = filters ?? {};

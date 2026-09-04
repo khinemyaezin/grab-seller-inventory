@@ -40,15 +40,6 @@ export default function useInventoryNewSlot(
         () => events?.getSnapshot("extension:inventory:new:updated:v1", groupId)?.payload
     );
 
-    useEffect(()=> {
-
-        console.log(`${slotId}_${groupId}`, {
-            payload_hook: payload,
-            context: context,
-            payload: ref.current?.getValues()
-        })
-    }, [ context, payload])
-
     useEffect(() => {
         if (!groupId) return;
         if (!events) return;
