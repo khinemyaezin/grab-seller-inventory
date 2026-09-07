@@ -33,6 +33,7 @@ import { InventoryWidgetHandle } from "../../hooks/use-inventory-new-slot";
 
 export type ProductInventoryWidgetProps = {
   context?: InventoryCreateContext;
+  initialValue?: InventoryPayload;
   value?: InventoryPayload;
   onChange: (value: InventoryPayload) => void;
   ref: Ref<InventoryWidgetHandle>;
@@ -50,6 +51,7 @@ const schema = z.fromJSONSchema(InventoryPayloadSchema) as z.ZodType<
 
 export default function ProductInventoryWidget({
   context,
+  initialValue,
   value,
   onChange,
   ref,
@@ -72,54 +74,37 @@ export default function ProductInventoryWidget({
   const [pickerOpen, setPickerOpen] = useState(false);
 
   const form = useForm<InventoryPayload>({
-    defaultValues: DEFAULT_VALUE,
+    defaultValues: initialValue ?? value ?? DEFAULT_VALUE,
     resolver: zodResolver(schema),
     mode: "onChange",
   });
-  const { control, reset, register, watch, formState: { errors } } = form;
+  const { control, reset, register, watch, setValue, getValues, formState: { errors } } = form;
   const { fields, replace } = useFieldArray({ control, name: "locations" });
-  const isSeeded = useRef(false);
 
+  const hasInitializedLocations = useRef(false);
   useEffect(() => {
-    if (isSeeded.current) return;
-    if (!locations.length) return;
-    const initialLocations = value?.locations?.length
-      ? value.locations
-      : locations.map((loc) => ({
+    if (hasInitializedLocations.current || !locations.length) return;
+    const currentLocations = getValues("locations");
+    if (!currentLocations || currentLocations.length === 0) {
+      const defaultLocations = locations.map((loc) => ({
         locationId: loc.id,
         initialQuantity: 0,
         safetyStock: 0,
       }));
-    reset({ ...DEFAULT_VALUE, ...value, ...context, locations: initialLocations });
-    isSeeded.current = true;
-    void form.trigger();
-  }, [locations, value, context, reset, form]);
+      replace(defaultLocations);
+      hasInitializedLocations.current = true;
+    }
+  }, [locations, getValues, replace]);
 
   useEffect(() => {
-    if (!isSeeded.current || !context) return;
-    const current = form.getValues();
-    reset({ ...current, ...context });
-    void form.trigger();
-  }, [context, reset, form]);
-
-  const prevValueRef = useRef(value);
-  useEffect(() => {
-    if (!isSeeded.current) return;
-    if (value === prevValueRef.current) return;
-    prevValueRef.current = value;
-    const current = form.getValues();
-    const nextLocations = value?.locations?.length
-      ? value.locations
-      : current.locations;
-    reset({ ...current, ...value, locations: nextLocations });
-    void form.trigger();
-  }, [value, reset, form]);
-
+    if (context?.sku) {
+      setValue("sku", context.sku);
+    }
+  }, [context?.sku, setValue]);
 
   const emitChange = useCallback(async () => {
-    await form.trigger();
-    onChange(form.getValues());
-  }, [form, onChange]);
+    onChange(getValues());
+  }, [getValues, onChange]);
 
   const { debounceFn: debouncedEmitChange } = useDebounce(emitChange, 300);
 
@@ -137,19 +122,32 @@ export default function ProductInventoryWidget({
       validate: async () => {
         const isValid = await form.trigger();
         if (isValid) {
-          return { value: form.getValues() };
+          return { value: getValues() };
         }
 
         return { errors: collectFormErrors(form.formState.errors) };
       },
-      getValues: () => form.getValues(),
+      getValues: () => getValues(),
+      reset: () => {
+        const defaultLocations = locations.map((loc) => ({
+          locationId: loc.id,
+          initialQuantity: 0,
+          safetyStock: 0,
+        }));
+        const next: InventoryPayload = {
+          sku: context?.sku ?? "",
+          locations: defaultLocations,
+        };
+        reset(next);
+        onChange(next);
+      },
     };
-  }, [form]);
+  }, [form, reset, getValues, onChange, locations, context?.sku]);
 
   const applyLocationSelection = (selectedIds: string[]) => {
     if (selectedIds.length === 0) return;
 
-    const current = form.getValues("locations");
+    const current = getValues("locations");
     const next: InventoryLocationStock[] = locations
       .filter((location) => selectedIds.includes(location.id))
       .map((location) => {

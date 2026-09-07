@@ -111,4 +111,31 @@ describe("useInventoryNewSlot", () => {
     expect(widget.validate).toHaveBeenCalledTimes(1);
     expect(handle!.getValues()).toEqual({ sku: "SKU-1", locations: [] });
   });
+
+  it("registerHandle reset delegates to the widget ref", () => {
+    let handle: SlotHandle | undefined;
+    const registerHandle = (next: SlotHandle) => {
+      handle = next;
+    };
+
+    const { result } = renderHook(() =>
+      useInventoryNewSlot({
+        ...SLOT_PROPS,
+        registerHandle,
+      }),
+    );
+
+    const widget: InventoryWidgetHandle = {
+      validate: vi.fn(async () => ({ value: { sku: "SKU-1", locations: [] } })),
+      getValues: () => ({ sku: "SKU-1", locations: [] }),
+      reset: vi.fn(),
+    };
+
+    act(() => {
+      result.current.ref.current = widget;
+    });
+
+    handle!.reset?.();
+    expect(widget.reset).toHaveBeenCalledTimes(1);
+  });
 });
