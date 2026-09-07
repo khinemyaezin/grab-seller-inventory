@@ -1,96 +1,59 @@
-import { InventoryCreateContext, InventoryPayload, SellerPlatform } from "@khinemyaezin/seller-contracts";
-import { useRef, useId, useState, useEffect } from "react";
+import {
+    InventoryCreateContext,
+    InventoryPayload,
+    type SlotHandle,
+} from "@khinemyaezin/seller-contracts";
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
+    mergeFromHydrate,
+    useRegisterSlotHandle,
+    type SlotWidgetHandle,
+} from "@khinemyaezin/seller-ui";
 
 export type UseInventoryNewSlotProps = {
-    groupId: string,
-    slotId: string,
-    platform?: SellerPlatform,
-    initialContext?: InventoryCreateContext
-}
-
-function mergeFromHydrate<T extends object>(
-    prev: T | undefined,
-    current: T | undefined,
-    context: Partial<T> | undefined,
-): T {
-    return { ...prev, ...current, ...context } as T;
-}
-
-export type InventoryWidgetHandle = {
-    validate: () => Promise<{
-        value?: InventoryPayload;
-        errors?: Record<string, string>;
-    }>;
-    getValues: () => InventoryPayload;
+    groupId: string;
+    slotId: string;
+    context?: InventoryCreateContext;
+    initialValue?: InventoryPayload;
+    onChange?: (value: InventoryPayload) => void;
+    registerHandle?: (handle: SlotHandle<InventoryPayload>) => void | (() => void);
 };
 
-export default function useInventoryNewSlot(
-    { groupId, slotId, platform, initialContext }: UseInventoryNewSlotProps
-) {
-    const events = platform?.events;
+export type InventoryWidgetHandle = SlotWidgetHandle<InventoryPayload>;
+
+export default function useInventoryNewSlot({
+    context,
+    initialValue,
+    onChange,
+    registerHandle,
+}: UseInventoryNewSlotProps) {
     const ref = useRef<InventoryWidgetHandle>(null);
-    const producerId = useId();
+    const [payload, setPayload] = useState<InventoryPayload | undefined>(initialValue);
+    const payloadRef = useRef(payload);
+    payloadRef.current = payload;
+    const onChangeRef = useRef(onChange);
+    onChangeRef.current = onChange;
 
-    const [context, setContext] = useState<InventoryCreateContext | undefined>(
-        () => (initialContext as InventoryCreateContext) ??
-            events?.getSnapshot("extension:inventory:new:hydrate:v1", groupId)?.payload
-    );
+    useRegisterSlotHandle(ref, registerHandle);
 
-    const [payload, setPayload] = useState<InventoryPayload | undefined>(
-        () => events?.getSnapshot("extension:inventory:new:updated:v1", groupId)?.payload
-    );
+    const sku = context?.sku;
 
     useEffect(() => {
-        if (!groupId) return;
-        if (!events) return;
+        if (sku === undefined) return;
+        const prev = payloadRef.current;
+        if (prev?.sku === sku) return;
 
-        const unsubs = [
-            events.subscribe("extension:validate:v1", async (msg) => {
-                if (msg.producerId === producerId) return;
-                if (msg.groupId !== groupId) return;
-                if (msg.slotId && msg.slotId !== slotId) return;
+        const next = mergeFromHydrate(prev, ref.current?.getValues(), { sku });
+        payloadRef.current = next;
+        setPayload(next);
+        onChangeRef.current?.(next);
+    }, [sku]);
 
-                const result = await ref.current?.validate();
+    const handleChange = useCallback((next: InventoryPayload) => {
+        payloadRef.current = next;
+        setPayload(next);
+        onChangeRef.current?.(next);
+    }, []);
 
-                events.emit("extension:validated:v1", {
-                    producerId,
-                    groupId,
-                    slotId,
-                    valid: result ? !result.errors : false,
-                    ...(result?.errors
-                        ? { errors: result.errors, payload: undefined }
-                        : { payload: result?.value }),
-                });
-            }),
-            events.subscribe("extension:inventory:new:hydrate:v1", (msg) => {
-                if (msg.producerId === producerId) return;
-                if (msg.groupId && msg.groupId !== groupId) return;
-                if (msg.slotId && msg.slotId !== slotId) return;
-                if (!msg.payload) return;
-
-                setContext(msg.payload);
-                setPayload((prev) => mergeFromHydrate(prev, ref.current?.getValues(), msg.payload));
-            }),
-            events.subscribe("extension:inventory:new:updated:v1", (msg) => {
-                if (msg.producerId === producerId) return;
-                if (msg.groupId !== groupId) return;
-                if (!msg.payload) return;
-
-                setPayload(msg.payload);
-            }),
-        ];
-
-        return () => unsubs.forEach((unsub) => unsub());
-    }, [events, groupId, slotId, producerId]);
-
-    const onChange = (next: InventoryPayload) => {
-        events?.setState("extension:inventory:new:updated:v1", {
-            producerId,
-            groupId,
-            slotId,
-            payload: next,
-        });
-    };
-
-    return { context, payload, ref, onChange };
+    return { context, payload, ref, onChange: handleChange };
 }
