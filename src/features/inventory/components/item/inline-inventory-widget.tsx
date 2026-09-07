@@ -20,6 +20,7 @@ import { InventoryWidgetHandle } from "../../hooks/use-inventory-new-slot";
 
 export type InlineInventoryWidgetProps = {
   context?: InventoryCreateContext;
+  initialValue?: InventoryPayload;
   value?: Partial<InventoryPayload>;
   onChange: (value: InventoryPayload) => void;
   ref: Ref<InventoryWidgetHandle>;
@@ -37,6 +38,7 @@ const schema = z.fromJSONSchema(InventoryPayloadSchema) as z.ZodType<
 
 export default function InlineInventoryWidget({
   context,
+  initialValue,
   value,
   onChange,
   ref,
@@ -50,57 +52,35 @@ export default function InlineInventoryWidget({
     .filter((location) => location.active);
 
   const form = useForm<InventoryPayload>({
-    defaultValues: DEFAULT_VALUE,
+    defaultValues: initialValue ?? (value as InventoryPayload | undefined) ?? DEFAULT_VALUE,
     resolver: zodResolver(schema),
     mode: "onChange",
   });
-  const { reset, register, watch, formState: { errors } } = form;
-  const isSeeded = useRef(false);
+  const { reset, register, watch, setValue, getValues, formState: { errors } } = form;
+
+  const hasInitializedLocations = useRef(false);
+  useEffect(() => {
+    if (hasInitializedLocations.current || !locations.length) return;
+    const currentLocations = getValues("locations");
+    if (!currentLocations || currentLocations.length === 0) {
+      setValue("locations", [{
+        locationId: locations[0].id,
+        initialQuantity: 0,
+        safetyStock: 0,
+      }]);
+      hasInitializedLocations.current = true;
+    }
+  }, [locations, getValues, setValue]);
 
   useEffect(() => {
-    if (isSeeded.current) return;
-    if (!locations.length) return;
-
-    const singleLocation = locations[0];
-    const initialLocations = value?.locations?.length
-      ? value.locations
-      : [{
-          locationId: singleLocation.id,
-          initialQuantity: 0,
-          safetyStock: 0,
-        }];
-
-    reset({ ...DEFAULT_VALUE, ...value, ...context, locations: initialLocations });
-    isSeeded.current = true;
-    void form.trigger();
-  }, [locations, value, context, reset, form]);
-
-  useEffect(() => {
-    if (!isSeeded.current || !context) return;
-    const current = form.getValues();
-    reset({ ...current, ...context });
-    void form.trigger();
-  }, [context, reset, form]);
-
-  const prevValueRef = useRef(value);
-  useEffect(() => {
-    if (!isSeeded.current) return;
-    if (value === prevValueRef.current) return;
-    prevValueRef.current = value;
-
-    const current = form.getValues();
-    const nextLocations = value?.locations?.length
-      ? value.locations
-      : current.locations;
-
-    reset({ ...current, ...value, locations: nextLocations });
-    void form.trigger();
-  }, [value, reset, form]);
+    if (context?.sku) {
+      setValue("sku", context.sku);
+    }
+  }, [context?.sku, setValue]);
 
   const emitChange = useCallback(async () => {
-    await form.trigger();
-    onChange(form.getValues());
-  }, [form, onChange]);
+    onChange(getValues());
+  }, [getValues, onChange]);
 
   const { debounceFn: debouncedEmitChange } = useDebounce(emitChange, 300);
 
@@ -118,14 +98,29 @@ export default function InlineInventoryWidget({
       validate: async () => {
         const isValid = await form.trigger();
         if (isValid) {
-          return { value: form.getValues() };
+          return { value: getValues() };
         }
 
         return { errors: collectFormErrors(form.formState.errors) };
       },
-      getValues: () => form.getValues(),
+      getValues: () => getValues(),
+      reset: () => {
+        const defaultLocations = locations.length > 0
+          ? [{
+              locationId: locations[0].id,
+              initialQuantity: 0,
+              safetyStock: 0,
+            }]
+          : [];
+        const next: InventoryPayload = {
+          sku: context?.sku ?? "",
+          locations: defaultLocations,
+        };
+        reset(next);
+        onChange(next);
+      },
     };
-  }, [form]);
+  }, [form, reset, getValues, onChange, locations, context?.sku]);
 
   if (locations.length === 0) {
     return null;

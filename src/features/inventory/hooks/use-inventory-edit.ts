@@ -63,21 +63,24 @@ export function useInventoryEdit({
   const formValueRef = useRef(formValue);
   formValueRef.current = formValue;
   const seededVariantIdRef = useRef<string | undefined>(undefined);
+  const seedRef = useRef<InventoryItemEditForm | undefined>(undefined);
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
 
   useEffect(() => {
     if (!catalogReady || !variantId) return;
 
     if (seededVariantIdRef.current !== variantId) {
       seededVariantIdRef.current = variantId;
-      setFormValue(
-        seedEditForm({
-          sku,
-          variantId,
-          locations,
-          items,
-          payload: value,
-        }),
-      );
+      const seeded = seedEditForm({
+        sku,
+        variantId,
+        locations,
+        items,
+        payload: value,
+      });
+      seedRef.current = structuredClone(seeded);
+      setFormValue(seeded);
       return;
     }
 
@@ -211,8 +214,16 @@ export function useInventoryEdit({
         return { value: getPayload() };
       },
       getValues: () => getPayload(),
+      reset: () => {
+        const seed = seedRef.current;
+        if (!seed) return;
+        const restored = structuredClone(seed);
+        formValueRef.current = restored;
+        setFormValue(restored);
+        onChangeRef.current?.(toEditPayload(restored, sku, variantId));
+      },
     }),
-    [getPayload],
+    [getPayload, sku, variantId],
   );
 
   return {
