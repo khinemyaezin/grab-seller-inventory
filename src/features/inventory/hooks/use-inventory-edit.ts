@@ -1,16 +1,18 @@
-import { type Ref, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
 import type {
   InventoryEditAdjustStock,
   InventoryEditContext,
   InventoryEditCreateStock,
   InventoryEditOp,
   InventoryEditPayload,
+  SlotHandle,
+  SlotWidgetHandle,
 } from "@khinemyaezin/seller-contracts";
+import { useRegisterSlotHandle } from "@khinemyaezin/seller-ui";
 import type { InventoryItemResponse } from "@/features/inventory/types";
 import { useInventoryItemsForVariantId } from "@/features/inventory/hooks/use-inventory-items-for-variant-id";
 import { useInventoryLink } from "@/features/inventory/hooks/use-root";
 import { useLocations } from "@/features/inventory/hooks/use-locations";
-import type { InventoryEditWidgetHandle } from "@/features/inventory/hooks/use-inventory-edit-slot";
 import type { StockOperationSubmit } from "@/features/inventory/components/stock-operations";
 import type { InventoryItemEditForm, InventoryItemEditRow } from "../types/inventory.form";
 import {
@@ -22,6 +24,8 @@ import {
   toEditPayload,
 } from "./inventory-edit-form";
 
+export type InventoryEditWidgetHandle = SlotWidgetHandle<InventoryEditPayload>;
+
 const LOCATIONS_QUERY = { page: 0, size: 100 };
 
 export type UseInventoryEditControllerOptions = {
@@ -29,7 +33,7 @@ export type UseInventoryEditControllerOptions = {
   value?: InventoryEditPayload;
   onChange?: (value: InventoryEditPayload) => void;
   onConfirm?: (item: InventoryItemResponse | undefined, payload: StockOperationSubmit) => Promise<void>;
-  ref?: Ref<InventoryEditWidgetHandle>;
+  registerHandle?: (handle: SlotHandle<InventoryEditPayload>) => void | (() => void);
 };
 
 export function useInventoryEdit({
@@ -37,7 +41,7 @@ export function useInventoryEdit({
   value,
   onChange,
   onConfirm,
-  ref,
+  registerHandle,
 }: UseInventoryEditControllerOptions) {
   const variantId = context?.variantId?.trim();
   const sku = context?.sku;
@@ -66,6 +70,9 @@ export function useInventoryEdit({
   const seedRef = useRef<InventoryItemEditForm | undefined>(undefined);
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
+  const ref = useRef<InventoryEditWidgetHandle>(null);
+
+  useRegisterSlotHandle(ref, registerHandle);
 
   useEffect(() => {
     if (!catalogReady || !variantId) return;

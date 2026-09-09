@@ -1,3 +1,9 @@
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useFieldArray, useFormContext } from "react-hook-form";
+import type {
+  InventoryLocationStock,
+  InventoryPayload,
+} from "@khinemyaezin/seller-contracts";
 import {
   Field,
   FieldError,
@@ -12,58 +18,22 @@ import {
   TableHeader,
   TableRow,
 } from "@khinemyaezin/seller-ui/components/table";
-import {
-  InventoryCreateContext,
-  InventoryPayload,
-  InventoryPayloadSchema,
-  type InventoryLocationStock,
-} from "@khinemyaezin/seller-contracts";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useFieldArray, useForm } from "react-hook-form";
-import { Ref, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
-import { useDebounce } from "@khinemyaezin/seller-ui";
+import { Button } from "@khinemyaezin/seller-ui/components/button";
+import { Pencil } from "lucide-react";
 import { useInventoryLink } from "@/features/inventory/hooks/use-root";
 import { useLocations } from "@/features/inventory/hooks/use-locations";
 import { LocationPickerDialog } from "./location-picker-dialog";
-import { collectFormErrors } from "./inventory-widget-utils";
-import { Button } from "@khinemyaezin/seller-ui/components/button";
-import { Pencil } from "lucide-react";
-import { InventoryWidgetHandle } from "../../hooks/use-inventory-new-slot";
 
-export type ProductInventoryWidgetProps = {
-  context?: InventoryCreateContext;
-  initialValue?: InventoryPayload;
-  value?: InventoryPayload;
-  onChange: (value: InventoryPayload) => void;
-  ref: Ref<InventoryWidgetHandle>;
-};
-
-const DEFAULT_VALUE: InventoryPayload = {
-  sku: "",
-  locations: [],
-};
-
-const schema = z.fromJSONSchema(InventoryPayloadSchema) as z.ZodType<
-  InventoryPayload,
-  InventoryPayload
->;
-
-export default function ProductInventoryWidget({
-  context,
-  initialValue,
-  value,
-  onChange,
-  ref,
-}: ProductInventoryWidgetProps) {
+export function InventoryFields() {
   const searchLocationLink = useInventoryLink("searchLocation");
   const { data: locationsData } = useLocations(searchLocationLink, {
     page: 0,
     size: 100,
   });
   const locations = useMemo(() => {
-    return (locationsData?._embedded?.locationResponseList ?? [])
-      .filter((location) => location.active);
+    return (locationsData?._embedded?.locationResponseList ?? []).filter(
+      (location) => location.active,
+    );
   }, [locationsData]);
 
   const locationById = useMemo(
@@ -71,78 +41,30 @@ export default function ProductInventoryWidget({
     [locations],
   );
 
-  const [pickerOpen, setPickerOpen] = useState(false);
-
-  const form = useForm<InventoryPayload>({
-    defaultValues: initialValue ?? value ?? DEFAULT_VALUE,
-    resolver: zodResolver(schema),
-    mode: "onChange",
-  });
-  const { control, reset, register, watch, setValue, getValues, formState: { errors } } = form;
+  const {
+    control,
+    register,
+    getValues,
+    formState: { errors },
+  } = useFormContext<InventoryPayload>();
   const { fields, replace } = useFieldArray({ control, name: "locations" });
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   const hasInitializedLocations = useRef(false);
   useEffect(() => {
     if (hasInitializedLocations.current || !locations.length) return;
     const currentLocations = getValues("locations");
     if (!currentLocations || currentLocations.length === 0) {
-      const defaultLocations = locations.map((loc) => ({
-        locationId: loc.id,
-        initialQuantity: 0,
-        safetyStock: 0,
-      }));
-      replace(defaultLocations);
-      hasInitializedLocations.current = true;
-    }
-  }, [locations, getValues, replace]);
-
-  useEffect(() => {
-    if (context?.sku) {
-      setValue("sku", context.sku);
-    }
-  }, [context?.sku, setValue]);
-
-  const emitChange = useCallback(async () => {
-    onChange(getValues());
-  }, [getValues, onChange]);
-
-  const { debounceFn: debouncedEmitChange } = useDebounce(emitChange, 300);
-
-  useEffect(() => {
-    const subscription = watch((_next, { name }) => {
-      if (name) {
-        debouncedEmitChange();
-      }
-    });
-    return () => subscription.unsubscribe();
-  }, [watch, debouncedEmitChange]);
-
-  useImperativeHandle(ref, () => {
-    return {
-      validate: async () => {
-        const isValid = await form.trigger();
-        if (isValid) {
-          return { value: getValues() };
-        }
-
-        return { errors: collectFormErrors(form.formState.errors) };
-      },
-      getValues: () => getValues(),
-      reset: () => {
-        const defaultLocations = locations.map((loc) => ({
+      replace(
+        locations.map((loc) => ({
           locationId: loc.id,
           initialQuantity: 0,
           safetyStock: 0,
-        }));
-        const next: InventoryPayload = {
-          sku: context?.sku ?? "",
-          locations: defaultLocations,
-        };
-        reset(next);
-        onChange(next);
-      },
-    };
-  }, [form, reset, getValues, onChange, locations, context?.sku]);
+        })),
+      );
+      hasInitializedLocations.current = true;
+    }
+  }, [locations, getValues, replace]);
 
   const applyLocationSelection = (selectedIds: string[]) => {
     if (selectedIds.length === 0) return;
@@ -161,7 +83,6 @@ export default function ProductInventoryWidget({
 
     replace(next);
     setPickerOpen(false);
-    void emitChange();
   };
 
   return (
@@ -233,7 +154,7 @@ export default function ProductInventoryWidget({
                       </Field>
                     </TableCell>
                   </TableRow>
-                )
+                );
               })}
             </TableBody>
           </Table>

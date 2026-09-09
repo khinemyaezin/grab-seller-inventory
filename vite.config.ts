@@ -23,9 +23,9 @@ export default defineConfig(({ mode }) => {
           "./DashboardRoutes": "./src/app/DashboardRoutes.tsx",
           "./LocationRoutes": "./src/app/LocationRoutes.tsx",
           "./StockRoutes": "./src/app/StockRoutes.tsx",
-          "./ProductInventoryWidget": "./src/features/inventory/components/item/product-inventory-widget-exposed.tsx",
-          "./InlineInventoryWidget": "./src/features/inventory/components/item/inline-inventory-widget-exposed.tsx",
-          "./InventoryItemEditWidget": "./src/features/inventory/components/item/inventory-item-edit-exposed.tsx",
+          "./ProductInventoryWidget": "./src/features/widget/inventory-create-widget.tsx",
+          "./InlineInventoryWidget": "./src/features/widget/inline-inventory-create-widget.tsx",
+          "./InventoryItemEditWidget": "./src/features/widget/inventory-edit-widget.tsx",
         },
         shared: {
           "react": { singleton: true, requiredVersion: "19.2.4" },
