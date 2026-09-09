@@ -1,6 +1,10 @@
-import type { ComponentProps, Ref } from "react";
+import type { ComponentProps } from "react";
 import { useMemo, useState } from "react";
-import type { InventoryEditContext, InventoryEditPayload } from "@khinemyaezin/seller-contracts";
+import type {
+  InventoryEditContext,
+  InventoryEditPayload,
+  SlotHandle,
+} from "@khinemyaezin/seller-contracts";
 import { Button } from "@khinemyaezin/seller-ui/components/button";
 import { FieldGroup } from "@khinemyaezin/seller-ui/components/field";
 import { Skeleton } from "@khinemyaezin/seller-ui/components/skeleton";
@@ -13,7 +17,6 @@ import {
   TableRow,
 } from "@khinemyaezin/seller-ui/components/table";
 import { Pencil } from "lucide-react";
-import type { InventoryEditWidgetHandle } from "@/features/inventory/hooks/use-inventory-edit-slot";
 import { useInventoryEdit } from "@/features/inventory/hooks/use-inventory-edit";
 import { StockOperationPopover } from "@/features/inventory/components/stock-operations";
 import { LocationPickerDialog } from "./location-picker-dialog";
@@ -22,7 +25,7 @@ export type InventoryItemEditProps = {
   context?: InventoryEditContext;
   value?: InventoryEditPayload;
   onChange?: (value: InventoryEditPayload) => void;
-  ref?: Ref<InventoryEditWidgetHandle>;
+  registerHandle?: (handle: SlotHandle<InventoryEditPayload>) => void | (() => void);
 };
 
 function QuantityTrigger({ value, ...props }: ComponentProps<typeof Button> & { value: number }) {
@@ -38,12 +41,12 @@ function QuantityTrigger({ value, ...props }: ComponentProps<typeof Button> & { 
   );
 }
 
-export default function InventoryItemEdit({ context, value, onChange, ref }: InventoryItemEditProps) {
+export default function ItemPopoverEditForm({ context, value, onChange, registerHandle }: InventoryItemEditProps) {
   const { formValue, isLoading, locations, confirmForItem, applyLocationSelection } = useInventoryEdit({
     context,
     value,
     onChange,
-    ref,
+    registerHandle,
   });
   const [pickerOpen, setPickerOpen] = useState(false);
   const selectedIds = useMemo(
