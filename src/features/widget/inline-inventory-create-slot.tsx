@@ -3,20 +3,20 @@ import type {
   InventoryPayload,
   SlotWidgetProps,
 } from "@khinemyaezin/seller-contracts";
-import { InventoryCreateForm } from "../inventory/components/item/inventory-create-form";
-import { InlineInventoryFields } from "../inventory/components/item/inline-inventory-fields";
+import { InventoryCreateFormContext } from "../inventory/components/item/item-popover-create-form-context";
+import { ItemInlinePopoverFields } from "../inventory/components/item/item-inline-popover-fields";
 
 export function InventoryCreateInlineSlot(
   props: SlotWidgetProps<InventoryCreateContext, InventoryPayload>,
 ) {
   return (
-    <InventoryCreateForm
-      context={props.context}
-      defaultValues={props.initialValue}
-      onValuesChange={props.onChange}
-      registerHandle={props.registerHandle}
+    <InventoryCreateFormContext
+      {...props}
+      loadingFallback={
+        <span className="text-sm text-muted-foreground">…</span>
+      }
     >
-      <InlineInventoryFields />
-    </InventoryCreateForm>
+      <ItemInlinePopoverFields />
+    </InventoryCreateFormContext>
   );
 }

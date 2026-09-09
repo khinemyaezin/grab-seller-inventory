@@ -1,4 +1,6 @@
 import { describe, it, expect } from "vitest";
+import { z } from "zod";
+import { InventoryEditPayloadSchema } from "@khinemyaezin/seller-contracts";
 import type { InventoryItemResponse, LocationResponse } from "../types";
 import {
   reconcileEditForm,
@@ -97,5 +99,18 @@ describe("inventory-edit-form", () => {
     expect(next.items).toHaveLength(1);
     expect(next.items[0]?.op).toBe("CREATE");
     expect(next.items[0]?.operation).toBeDefined();
+  });
+
+  it("generates a valid schema payload compatible with InventoryEditPayloadSchema", () => {
+    const schema = z.fromJSONSchema(InventoryEditPayloadSchema);
+    const form = seedEditForm({
+      sku: "SKU-1",
+      variantId: "var-1",
+      locations: [warehouse],
+      items: [item("inv-1", "wh-1", 8)],
+    });
+    const payload = toEditPayload(form);
+    const parsed = schema.safeParse(payload);
+    expect(parsed.success).toBe(true);
   });
 });

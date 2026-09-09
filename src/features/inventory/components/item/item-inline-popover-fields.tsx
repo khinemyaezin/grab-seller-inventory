@@ -1,41 +1,16 @@
-import { useEffect, useRef } from "react";
 import { useFormContext } from "react-hook-form";
 import type { InventoryPayload } from "@khinemyaezin/seller-contracts";
 import { Field, FieldError } from "@khinemyaezin/seller-ui/components/field";
 import { Input } from "@khinemyaezin/seller-ui/components/input";
-import { useInventoryLink } from "@/features/inventory/hooks/use-root";
-import { useLocations } from "@/features/inventory/hooks/use-locations";
+import { useInventoryCreateLocations } from "./item-popover-create-form-context";
 
-export function InlineInventoryFields() {
-  const searchLocationLink = useInventoryLink("searchLocation");
-  const { data: locationsData } = useLocations(searchLocationLink, {
-    page: 0,
-    size: 100,
-  });
-  const locations = (locationsData?._embedded?.locationResponseList ?? []).filter(
-    (location) => location.active,
-  );
+export function ItemInlinePopoverFields() {
+  const { locations } = useInventoryCreateLocations();
 
   const {
     register,
-    getValues,
-    setValue,
     formState: { errors },
   } = useFormContext<InventoryPayload>();
-
-  const hasInitializedLocations = useRef(false);
-  useEffect(() => {
-    if (hasInitializedLocations.current || !locations.length) return;
-    const currentLocations = getValues("locations");
-    if (!currentLocations || currentLocations.length === 0) {
-      setValue("locations", [{
-        locationId: locations[0].id,
-        initialQuantity: 0,
-        safetyStock: 0,
-      }]);
-      hasInitializedLocations.current = true;
-    }
-  }, [locations, getValues, setValue]);
 
   if (locations.length === 0) {
     return null;

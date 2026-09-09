@@ -41,7 +41,7 @@ function QuantityTrigger({ value, ...props }: ComponentProps<typeof Button> & { 
   );
 }
 
-export default function InventoryItemEdit({ context, value, onChange, registerHandle }: InventoryItemEditProps) {
+export default function ItemPopoverEditForm({ context, value, onChange, registerHandle }: InventoryItemEditProps) {
   const { formValue, isLoading, locations, confirmForItem, applyLocationSelection } = useInventoryEdit({
     context,
     value,

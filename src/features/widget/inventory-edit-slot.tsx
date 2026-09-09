@@ -3,13 +3,13 @@ import type {
   InventoryEditPayload,
   SlotWidgetProps,
 } from "@khinemyaezin/seller-contracts";
-import InventoryItemEdit from "../inventory/components/item/inventory-item-edit";
+import ItemPopoverEditForm from "../inventory/components/item/item-popover-edit-form";
 
 export function InventoryEditSlot(
   props: SlotWidgetProps<InventoryEditContext, InventoryEditPayload>,
 ) {
   return (
-    <InventoryItemEdit
+    <ItemPopoverEditForm
       context={props.context}
       value={props.initialValue}
       onChange={props.onChange}

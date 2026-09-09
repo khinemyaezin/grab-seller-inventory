@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import {
   InventoryPayloadSchema,
-  type InventoryCreateContext,
   type InventoryPayload,
   type SlotHandle,
 } from "@khinemyaezin/seller-contracts";
@@ -22,48 +21,40 @@ const DEFAULT_VALUE: InventoryPayload = {
 };
 
 export type InventoryCreateFormProps = {
-  context?: InventoryCreateContext;
-  defaultValues?: InventoryPayload;
+  seed?: InventoryPayload;
+  contextSku?: string;
   onValuesChange?: (values: InventoryPayload) => void;
   registerHandle?: (handle: SlotHandle<InventoryPayload>) => void | (() => void);
   children: ReactNode;
 };
 
-export function InventoryCreateForm({
-  context,
-  defaultValues,
+export function ItemPopoverCreateForm({
+  seed,
+  contextSku,
   onValuesChange,
   registerHandle,
   children,
 }: InventoryCreateFormProps) {
   const form = useForm<InventoryPayload>({
-    defaultValues: {
-      ...(defaultValues ?? DEFAULT_VALUE),
-      ...(context?.sku !== undefined ? { sku: context.sku } : {}),
-    },
+    defaultValues: seed ?? DEFAULT_VALUE,
     resolver: zodResolver(schema),
     mode: "onChange",
   });
 
   const { setValue, getValues } = form;
-  const contextSku = context?.sku;
 
   useEffect(() => {
-    if (contextSku === undefined) return;
-    if (getValues("sku") === contextSku) return;
-    setValue("sku", contextSku, { shouldDirty: true });
+    if (contextSku !== undefined && getValues("sku") !== contextSku) {
+      setValue("sku", contextSku, { shouldDirty: true });
+    }
   }, [contextSku, setValue, getValues]);
 
   const source = useRhfValueSource(form);
   useSlotChangeEmitter(source, onValuesChange);
 
   const getBaseline = useCallback((): InventoryPayload => {
-    const mounted = form.formState.defaultValues;
-    return {
-      sku: contextSku ?? mounted?.sku ?? "",
-      locations: (mounted?.locations ?? []) as InventoryPayload["locations"],
-    };
-  }, [contextSku, form.formState.defaultValues]);
+    return seed ?? DEFAULT_VALUE;
+  }, [seed]);
 
   useRhfSlotHandle(form, registerHandle, getBaseline, onValuesChange);
 

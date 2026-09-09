@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
-import type {
+import { z } from "zod";
+import {
   InventoryEditAdjustStock,
   InventoryEditContext,
   InventoryEditCreateStock,
   InventoryEditOp,
   InventoryEditPayload,
+  InventoryEditPayloadSchema,
   SlotHandle,
   SlotWidgetHandle,
 } from "@khinemyaezin/seller-contracts";
@@ -23,6 +25,11 @@ import {
   seedEditForm,
   toEditPayload,
 } from "./inventory-edit-form";
+
+const editSchema = z.fromJSONSchema(InventoryEditPayloadSchema) as z.ZodType<
+  InventoryEditPayload,
+  InventoryEditPayload
+>;
 
 export type InventoryEditWidgetHandle = SlotWidgetHandle<InventoryEditPayload>;
 
@@ -218,7 +225,17 @@ export function useInventoryEdit({
     ref,
     () => ({
       validate: async () => {
-        return { value: getPayload() };
+        const payload = getPayload();
+        const parsed = editSchema.safeParse(payload);
+        if (!parsed.success) {
+          const errors: Record<string, string> = {};
+          for (const issue of parsed.error.issues) {
+            const path = issue.path.join(".");
+            errors[path || "root"] = issue.message;
+          }
+          return { errors };
+        }
+        return { value: payload };
       },
       getValues: () => getPayload(),
       reset: () => {

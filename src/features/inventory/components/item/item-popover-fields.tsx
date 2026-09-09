@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import type {
   InventoryLocationStock,
@@ -20,26 +20,11 @@ import {
 } from "@khinemyaezin/seller-ui/components/table";
 import { Button } from "@khinemyaezin/seller-ui/components/button";
 import { Pencil } from "lucide-react";
-import { useInventoryLink } from "@/features/inventory/hooks/use-root";
-import { useLocations } from "@/features/inventory/hooks/use-locations";
+import { useInventoryCreateLocations } from "./item-popover-create-form-context";
 import { LocationPickerDialog } from "./location-picker-dialog";
 
-export function InventoryFields() {
-  const searchLocationLink = useInventoryLink("searchLocation");
-  const { data: locationsData } = useLocations(searchLocationLink, {
-    page: 0,
-    size: 100,
-  });
-  const locations = useMemo(() => {
-    return (locationsData?._embedded?.locationResponseList ?? []).filter(
-      (location) => location.active,
-    );
-  }, [locationsData]);
-
-  const locationById = useMemo(
-    () => new Map(locations.map((location) => [location.id, location])),
-    [locations],
-  );
+export function ItemPopoverFields() {
+  const { locations, locationById } = useInventoryCreateLocations();
 
   const {
     control,
@@ -49,22 +34,6 @@ export function InventoryFields() {
   } = useFormContext<InventoryPayload>();
   const { fields, replace } = useFieldArray({ control, name: "locations" });
   const [pickerOpen, setPickerOpen] = useState(false);
-
-  const hasInitializedLocations = useRef(false);
-  useEffect(() => {
-    if (hasInitializedLocations.current || !locations.length) return;
-    const currentLocations = getValues("locations");
-    if (!currentLocations || currentLocations.length === 0) {
-      replace(
-        locations.map((loc) => ({
-          locationId: loc.id,
-          initialQuantity: 0,
-          safetyStock: 0,
-        })),
-      );
-      hasInitializedLocations.current = true;
-    }
-  }, [locations, getValues, replace]);
 
   const applyLocationSelection = (selectedIds: string[]) => {
     if (selectedIds.length === 0) return;
