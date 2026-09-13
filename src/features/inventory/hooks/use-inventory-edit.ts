@@ -11,6 +11,7 @@ import {
   SlotWidgetHandle,
 } from "@khinemyaezin/seller-contracts";
 import { useRegisterSlotHandle } from "@khinemyaezin/seller-ui";
+import { projectInventoryEdit } from "../lib/project-inventory";
 import type { InventoryItemResponse } from "@/features/inventory/types";
 import { useInventoryItemsForVariantId } from "@/features/inventory/hooks/use-inventory-items-for-variant-id";
 import { useInventoryLink } from "@/features/inventory/hooks/use-root";
@@ -246,6 +247,7 @@ export function useInventoryEdit({
         setFormValue(restored);
         onChangeRef.current?.(toEditPayload(restored, sku, variantId));
       },
+      project: () => projectInventoryEdit(getPayload()),
     }),
     [getPayload, sku, variantId],
   );

@@ -7,8 +7,8 @@ import {
   type InventoryPayload,
   type SlotHandle,
 } from "@khinemyaezin/seller-contracts";
-import { useSlotChangeEmitter } from "@khinemyaezin/seller-ui";
-import { useRhfSlotHandle, useRhfValueSource } from "../../lib/from-rhf";
+import { useSlotChangeEmitter, useRhfSlotHandle, useRhfValueSource } from "@khinemyaezin/seller-ui";
+import { projectInventoryCreate } from "../../lib/project-inventory";
 
 const schema = z.fromJSONSchema(InventoryPayloadSchema) as z.ZodType<
   InventoryPayload,
@@ -45,18 +45,23 @@ export function ItemPopoverCreateForm({
 
   useEffect(() => {
     if (contextSku !== undefined && getValues("sku") !== contextSku) {
-      setValue("sku", contextSku, { shouldDirty: true });
+      setValue("sku", contextSku, { shouldDirty: false });
     }
   }, [contextSku, setValue, getValues]);
 
-  const source = useRhfValueSource(form);
+  const source = useRhfValueSource<InventoryPayload>(form);
   useSlotChangeEmitter(source, onValuesChange);
 
   const getBaseline = useCallback((): InventoryPayload => {
     return seed ?? DEFAULT_VALUE;
   }, [seed]);
 
-  useRhfSlotHandle(form, registerHandle, getBaseline, onValuesChange);
+  useRhfSlotHandle<InventoryPayload>(form, {
+    registerHandle,
+    getBaseline,
+    onChange: onValuesChange,
+    project: projectInventoryCreate,
+  });
 
   return <FormProvider {...form}>{children}</FormProvider>;
 }
