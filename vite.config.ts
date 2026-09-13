@@ -24,7 +24,6 @@ export default defineConfig(({ mode }) => {
           "./LocationRoutes": "./src/app/LocationRoutes.tsx",
           "./StockRoutes": "./src/app/StockRoutes.tsx",
           "./ProductInventoryWidget": "./src/features/widget/inventory-create-widget.tsx",
-          "./InlineInventoryWidget": "./src/features/widget/inline-inventory-create-widget.tsx",
           "./InventoryItemEditWidget": "./src/features/widget/inventory-edit-widget.tsx",
         },
         shared: {
