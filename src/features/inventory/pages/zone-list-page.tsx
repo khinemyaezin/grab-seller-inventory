@@ -1,28 +1,15 @@
-
 import { Link, useParams } from "react-router";
 import { ArrowLeftIcon } from "lucide-react";
 import { Header } from "@khinemyaezin/seller-ui/layout/header";
 import { Button } from "@khinemyaezin/seller-ui/components/index";
-import { routes } from "@khinemyaezin/seller-contracts";
-import { useInventoryLink } from "@/features/inventory/hooks/use-root";
-import { useLocation } from "@/features/inventory/hooks/use-locations";
-import { resolveLink } from "@khinemyaezin/seller-api";
 import { usePlatform, useShellBreadcrumbSegment } from "@khinemyaezin/seller-ui";
-import { LocationSummary } from "@/features/inventory/components/location/location-summary";
-import ZonesView from "@/features/inventory/components/zone/zones-view";
+import { useLocationZoneLinks } from "@/features/inventory/hooks/use-location-zone-links";
+import LocationZonesView from "@/features/inventory/components/location/location-zones-view";
 import { ZoneLifecycleEvent, BinLifecycleEvent } from "@/types";
-
-type ZonesPageProps = {
-  params: Promise<{ id: string }>;
-};
 
 export default function ZonesPage() {
   const { locationId: id } = useParams<{ locationId: string }>();
-  const locationLink = useInventoryLink("location");
-  const { data: location } = useLocation(locationLink, id);
-
-  const pagedZone = resolveLink(location?._links, "search-zones");
-  const createZone = resolveLink(location?._links, "create-zone");
+  const { location, searchZones, createZone } = useLocationZoneLinks(id);
   const platform = usePlatform();
 
   useShellBreadcrumbSegment(":locationId", location?.name);
@@ -54,12 +41,14 @@ export default function ZonesPage() {
         </Button>
       </Header>
 
-      {location && (
-        <LocationSummary location={location} />
-      )}
-
-      {pagedZone && id && (
-        <ZonesView locationId={id} link={pagedZone} canCreate={!!createZone} onLifecycleEvent={handleEvent} />
+      {id && (
+        <LocationZonesView
+          locationId={id}
+          location={location}
+          searchLink={searchZones}
+          canCreate={!!createZone}
+          onLifecycleEvent={handleEvent}
+        />
       )}
     </div>
   );

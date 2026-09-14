@@ -15,14 +15,13 @@ export function useZones(link?: HateoasLink, locationId?: string, filter?: Zones
   });
 }
 
-export function useZone(link: HateoasLink, id: string) {
-  const expendLink = resolveUrlTemplate({ "zoneId": id }, link);
+export function useZone(link?: HateoasLink, id?: string) {
+  const expendLink = link && id ? resolveUrlTemplate({ "zoneId": id }, link) : undefined;
   return useQuery<ZoneResponse>({
     queryKey: ["zone", id],
-    queryFn: () => zoneService.getZone(expendLink),
-    enabled: !!link,
+    queryFn: () => zoneService.getZone(expendLink!),
+    enabled: !!link && !!id,
     staleTime: 1000 * 60 * 5,
-
   });
 }
 

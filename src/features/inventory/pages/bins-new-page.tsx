@@ -1,36 +1,21 @@
-
 import { Button, PageLoadingSkeleton } from "@khinemyaezin/seller-ui/components/index";
 import { Header } from "@khinemyaezin/seller-ui/layout/header";
 import { Link, useParams } from "react-router";
 import { ArrowLeftIcon } from "lucide-react";
 import { ButtonGroup } from "@khinemyaezin/seller-ui/components/button-group";
-import { useInventoryLink } from "@/features/inventory/hooks/use-root";
-import { useLocation } from "@/features/inventory/hooks/use-locations";
-import { useZone } from "@/features/inventory/hooks/use-zones";
-import { resolveLink } from "@khinemyaezin/seller-api";
-import type { HateoasLink } from "@khinemyaezin/seller-api";
 import { usePlatform, useShellBreadcrumbSegment } from "@khinemyaezin/seller-ui";
 import { BinLifecycleEvent } from "@/types";
 import BinNewForm from "@/features/inventory/components/bin/bin-new-form";
-
-type NewBinPageProps = {
-  params: Promise<{ id: string; zoneId: string }>;
-};
+import { useLocationZoneLinks } from "@/features/inventory/hooks/use-location-zone-links";
 
 export default function NewBinPage() {
   const { locationId, zoneId } = useParams<{ locationId: string; zoneId: string }>();
   if (!locationId || !zoneId) throw new Error("Missing inventory route parameters");
-  const id = locationId;
-  const locationLink = useInventoryLink("location");
-  const { data: location } = useLocation(locationLink, id);
-  const zoneLink = resolveLink(location?._links, "zone") ?? ({} as HateoasLink);
-  const { data: zone } = useZone(zoneLink, zoneId);
-
-  const createBinLink = resolveLink(zone?._links, "create-bin");
+  const { locationName, zoneName, createBin } = useLocationZoneLinks(locationId, zoneId);
   const platform = usePlatform();
 
-  useShellBreadcrumbSegment(":locationId", location?.name);
-  useShellBreadcrumbSegment(":zoneId", zone?.name);
+  useShellBreadcrumbSegment(":locationId", locationName);
+  useShellBreadcrumbSegment(":zoneId", zoneName);
 
   const toast = (type: "success" | "error", message: string) =>
     platform?.events.emit("shell:toast:v1", { type, message, position: "top-center" });
@@ -60,8 +45,8 @@ export default function NewBinPage() {
           </Button>
         </ButtonGroup>
       </Header>
-      {createBinLink ? (
-        <BinNewForm link={createBinLink} zoneId={zoneId} onLifecycleEvent={handleEvent} />
+      {createBin ? (
+        <BinNewForm link={createBin} zoneId={zoneId} onLifecycleEvent={handleEvent} />
       ) : (
         <PageLoadingSkeleton rows={2} />
       )}
