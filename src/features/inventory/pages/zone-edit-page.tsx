@@ -1,32 +1,22 @@
-
 import ZoneEditForm from "@/features/inventory/components/zone/zone-edit-form";
 import { Header } from "@khinemyaezin/seller-ui/layout/header";
 import { Button } from "@khinemyaezin/seller-ui/components/index";
 import { ButtonGroup } from "@khinemyaezin/seller-ui/components/button-group";
-import { useInventoryLink } from "@/features/inventory/hooks/use-root";
-import { useLocation } from "@/features/inventory/hooks/use-locations";
-import { resolveLink } from "@khinemyaezin/seller-api";
 import { ArrowLeftIcon } from "lucide-react";
 import { useState } from "react";
 import { Link, useParams } from "react-router";
 import { usePlatform, useShellBreadcrumbSegment } from "@khinemyaezin/seller-ui";
+import { useLocationZoneLinks } from "@/features/inventory/hooks/use-location-zone-links";
 import { ZoneLifecycleEvent } from "@/types";
-
-export type EditZonePageProps = {
-    params: Promise<{ id: string, zoneId: string }>;
-}
 
 export default function EditZonePage() {
     const { locationId, zoneId } = useParams<{ locationId: string; zoneId: string }>();
     if (!locationId || !zoneId) throw new Error("Missing inventory route parameters");
-    const id = locationId;
-    const locationLink = useInventoryLink("location");
-    const { data: location } = useLocation(locationLink, id);
-    const zoneLink = resolveLink(location?._links, "zone");
+    const { locationName, zoneGetLink } = useLocationZoneLinks(locationId);
     const platform = usePlatform();
     const [title, setTitle] = useState<string | undefined>();
 
-    useShellBreadcrumbSegment(":locationId", location?.name);
+    useShellBreadcrumbSegment(":locationId", locationName);
     useShellBreadcrumbSegment(":zoneId", title);
 
     const toast = (type: "success" | "error", message: string) =>
@@ -58,9 +48,9 @@ export default function EditZonePage() {
                     </Button>
                 </ButtonGroup>
             </Header>
-            {zoneLink && (
+            {zoneGetLink && (
                 <ZoneEditForm
-                    link={zoneLink} id={zoneId} onLifecycleEvent={handleEvent}
+                    link={zoneGetLink} id={zoneId} onLifecycleEvent={handleEvent}
                 />
             )}
         </div>
