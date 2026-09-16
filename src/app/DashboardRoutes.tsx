@@ -1,7 +1,7 @@
 import { Route, Routes } from "react-router";
 import { HateoasLink } from "@khinemyaezin/seller-api";
 import { SellerPlatform } from "@khinemyaezin/seller-contracts";
-import InventoryDashboardPage from "@/features/inventory/pages/inventory-dashboard-page";
+import InventoryDashboardPage from "@/features/inventory/dashboard/inventory-dashboard-page";
 import InventoryProviders from "./InventoryProviders";
 
 export default function DashboardRoutes({
