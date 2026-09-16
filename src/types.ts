@@ -1,2 +1,2 @@
 export * from "@khinemyaezin/seller-api";
-export * from "./features/inventory/types";
+export * from "@/features/inventory/types";

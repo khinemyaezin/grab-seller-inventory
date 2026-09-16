@@ -1,6 +1,6 @@
 import { api, resolveLink, type HateoasLink } from "@khinemyaezin/seller-api";
-import type { InventoryRoot } from "../types";
-import { InventoryRootResponse } from "../types/inventory.response";
+import type { InventoryRoot } from "@/features/inventory/types";
+import { InventoryRootResponse } from "@/features/inventory/types/inventory.response";
 
 export async function fetchInventoryRoot(link: HateoasLink): Promise<InventoryRoot> {
   const response = await api.followLink<InventoryRootResponse>(link)
